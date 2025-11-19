@@ -932,6 +932,17 @@
             const [activeTextarea, setActiveTextarea] = useState(null);
             const fileInputRef = useRef(null);
 
+            // Paste-Handler für das Entfernen von Formatierungen
+            const handlePaste = (e) => {
+                e.preventDefault();
+                
+                // Nur reinen Text aus der Zwischenablage holen
+                const text = e.clipboardData.getData('text/plain');
+                
+                // Text an aktueller Cursor-Position einfügen
+                document.execCommand('insertText', false, text);
+            };
+
             // Funktion zum Kopieren in Zwischenablage
             const copyToClipboard = async (text, part) => {
                 try {
@@ -1690,6 +1701,7 @@
                                             key: 'htmlTextarea',
                                             value: module.content,
                                             onChange: (e) => updateModuleContent(module.id, e.target.value),
+                                            onPaste: handlePaste,
                                             className: "w-full h-64 p-4 font-mono text-sm border border-gray-300 rounded-lg resize-y focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50",
                                             placeholder: "HTML Code hier bearbeiten...",
                                             spellCheck: false
@@ -1726,6 +1738,7 @@
                                                     const newContent = e.target.innerHTML;
                                                     updateModuleContent(module.id, newContent);
                                                 },
+                                                onPaste: handlePaste,
                                                 style: { outline: 'none' },
                                                 title: "Klicken Sie hier, um den Inhalt direkt zu bearbeiten"
                                             })
@@ -1745,6 +1758,7 @@
                                                 setActiveTextarea(e.target);
                                                 e.target.dataset.moduleIndex = module.index;
                                             },
+                                            onPaste: handlePaste,
                                             className: "w-full h-64 p-4 font-mono text-sm border border-gray-300 rounded-lg resize-y focus:ring-2 focus:ring-blue-500 focus:border-transparent",
                                             placeholder: "HTML Code hier bearbeiten..."
                                         })
