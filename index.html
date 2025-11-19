@@ -1001,26 +1001,49 @@
                 const [showColorPicker, setShowColorPicker] = React.useState(false);
                 const [showLinkInput, setShowLinkInput] = React.useState(false);
                 const [linkUrl, setLinkUrl] = React.useState('');
+                const [savedSelection, setSavedSelection] = React.useState(null);
+
+                // Selektion speichern
+                const saveSelection = () => {
+                    const selection = window.getSelection();
+                    if (selection.rangeCount > 0) {
+                        setSavedSelection(selection.getRangeAt(0));
+                    }
+                };
+
+                // Selektion wiederherstellen
+                const restoreSelection = () => {
+                    if (savedSelection && editableRef) {
+                        editableRef.focus();
+                        const selection = window.getSelection();
+                        selection.removeAllRanges();
+                        selection.addRange(savedSelection);
+                    }
+                };
 
                 const insertLink = () => {
-                    if (linkUrl && editableRef) {
-                        // Sicherstellen, dass Text markiert ist
-                        const selection = window.getSelection();
-                        if (selection.rangeCount > 0) {
-                            editableRef.focus();
-                            // URL validieren und formatieren
-                            let url = linkUrl.trim();
-                            if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                                url = 'https://' + url;
-                            }
-                            setTimeout(() => {
-                                document.execCommand('createLink', false, url);
-                                setLinkUrl('');
-                                setShowLinkInput(false);
-                            }, 10);
-                        } else {
-                            alert('Bitte markieren Sie zuerst den Text, der verlinkt werden soll.');
+                    if (linkUrl && savedSelection) {
+                        restoreSelection();
+                        // URL validieren und formatieren
+                        let url = linkUrl.trim();
+                        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                            url = 'https://' + url;
                         }
+                        setTimeout(() => {
+                            document.execCommand('createLink', false, url);
+                            setLinkUrl('');
+                            setShowLinkInput(false);
+                            setSavedSelection(null);
+                        }, 10);
+                    }
+                };
+
+                const applyFormatWithSelection = (command, value = null) => {
+                    if (savedSelection) {
+                        restoreSelection();
+                        setTimeout(() => {
+                            document.execCommand(command, false, value);
+                        }, 10);
                     }
                 };
 
@@ -1034,33 +1057,42 @@
                     }, [
                         React.createElement('button', {
                             key: 'bold',
+                            onMouseDown: (e) => {
+                                e.preventDefault();
+                                saveSelection();
+                            },
                             onClick: (e) => {
                                 e.preventDefault();
-                                applyFormat('bold', null, editableRef);
+                                applyFormatWithSelection('bold');
                             },
-                            onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 font-bold",
                             title: "Fett (Strg+B)",
                             type: "button"
                         }, 'B'),
                         React.createElement('button', {
                             key: 'italic',
+                            onMouseDown: (e) => {
+                                e.preventDefault();
+                                saveSelection();
+                            },
                             onClick: (e) => {
                                 e.preventDefault();
-                                applyFormat('italic', null, editableRef);
+                                applyFormatWithSelection('italic');
                             },
-                            onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 italic",
                             title: "Kursiv (Strg+I)",
                             type: "button"
                         }, 'I'),
                         React.createElement('button', {
                             key: 'underline',
+                            onMouseDown: (e) => {
+                                e.preventDefault();
+                                saveSelection();
+                            },
                             onClick: (e) => {
                                 e.preventDefault();
-                                applyFormat('underline', null, editableRef);
+                                applyFormatWithSelection('underline');
                             },
-                            onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 underline",
                             title: "Unterstrichen (Strg+U)",
                             type: "button"
@@ -1074,106 +1106,84 @@
                     }, [
                         React.createElement('button', {
                             key: 'h1',
+                            onMouseDown: (e) => {
+                                e.preventDefault();
+                                saveSelection();
+                            },
                             onClick: (e) => {
                                 e.preventDefault();
-                                if (editableRef) {
-                                    editableRef.focus();
-                                    setTimeout(() => {
-                                        const selection = window.getSelection();
-                                        if (selection.rangeCount > 0) {
-                                            document.execCommand('formatBlock', false, 'h1');
-                                        }
-                                    }, 10);
-                                }
+                                applyFormatWithSelection('formatBlock', 'h1');
                             },
-                            onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
                             title: "Überschrift 1",
                             type: "button"
                         }, 'H1'),
                         React.createElement('button', {
                             key: 'h2',
+                            onMouseDown: (e) => {
+                                e.preventDefault();
+                                saveSelection();
+                            },
                             onClick: (e) => {
                                 e.preventDefault();
-                                if (editableRef) {
-                                    editableRef.focus();
-                                    setTimeout(() => {
-                                        const selection = window.getSelection();
-                                        if (selection.rangeCount > 0) {
-                                            document.execCommand('formatBlock', false, 'h2');
-                                        }
-                                    }, 10);
-                                }
+                                applyFormatWithSelection('formatBlock', 'h2');
                             },
-                            onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
                             title: "Überschrift 2",
                             type: "button"
                         }, 'H2'),
                         React.createElement('button', {
                             key: 'h3',
+                            onMouseDown: (e) => {
+                                e.preventDefault();
+                                saveSelection();
+                            },
                             onClick: (e) => {
                                 e.preventDefault();
-                                if (editableRef) {
-                                    editableRef.focus();
-                                    setTimeout(() => {
-                                        const selection = window.getSelection();
-                                        if (selection.rangeCount > 0) {
-                                            document.execCommand('formatBlock', false, 'h3');
-                                        }
-                                    }, 10);
-                                }
+                                applyFormatWithSelection('formatBlock', 'h3');
                             },
-                            onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
                             title: "Überschrift 3",
                             type: "button"
                         }, 'H3'),
                         React.createElement('button', {
                             key: 'h4',
+                            onMouseDown: (e) => {
+                                e.preventDefault();
+                                saveSelection();
+                            },
                             onClick: (e) => {
                                 e.preventDefault();
-                                if (editableRef) {
-                                    editableRef.focus();
-                                    setTimeout(() => {
-                                        const selection = window.getSelection();
-                                        if (selection.rangeCount > 0) {
-                                            document.execCommand('formatBlock', false, 'h4');
-                                        }
-                                    }, 10);
-                                }
+                                applyFormatWithSelection('formatBlock', 'h4');
                             },
-                            onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
                             title: "Überschrift 4",
                             type: "button"
                         }, 'H4'),
                         React.createElement('button', {
                             key: 'h5',
+                            onMouseDown: (e) => {
+                                e.preventDefault();
+                                saveSelection();
+                            },
                             onClick: (e) => {
                                 e.preventDefault();
-                                if (editableRef) {
-                                    editableRef.focus();
-                                    setTimeout(() => {
-                                        const selection = window.getSelection();
-                                        if (selection.rangeCount > 0) {
-                                            document.execCommand('formatBlock', false, 'h5');
-                                        }
-                                    }, 10);
-                                }
+                                applyFormatWithSelection('formatBlock', 'h5');
                             },
-                            onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
                             title: "Überschrift 5",
                             type: "button"
                         }, 'H5'),
                         React.createElement('button', {
                             key: 'p',
+                            onMouseDown: (e) => {
+                                e.preventDefault();
+                                saveSelection();
+                            },
                             onClick: (e) => {
                                 e.preventDefault();
-                                applyFormat('formatBlock', '<p>', editableRef);
+                                applyFormatWithSelection('formatBlock', 'p');
                             },
-                            onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs",
                             title: "Normaler Text",
                             type: "button"
@@ -1187,22 +1197,28 @@
                     }, [
                         React.createElement('button', {
                             key: 'ul',
+                            onMouseDown: (e) => {
+                                e.preventDefault();
+                                saveSelection();
+                            },
                             onClick: (e) => {
                                 e.preventDefault();
-                                applyFormat('insertUnorderedList', null, editableRef);
+                                applyFormatWithSelection('insertUnorderedList');
                             },
-                            onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200",
                             title: "Aufzählungsliste",
                             type: "button"
                         }, '• Liste'),
                         React.createElement('button', {
                             key: 'ol',
+                            onMouseDown: (e) => {
+                                e.preventDefault();
+                                saveSelection();
+                            },
                             onClick: (e) => {
                                 e.preventDefault();
-                                applyFormat('insertOrderedList', null, editableRef);
+                                applyFormatWithSelection('insertOrderedList');
                             },
-                            onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200",
                             title: "Nummerierte Liste",
                             type: "button"
@@ -1216,11 +1232,14 @@
                     }, [
                         React.createElement('button', {
                             key: 'colorBtn',
+                            onMouseDown: (e) => {
+                                e.preventDefault();
+                                saveSelection();
+                            },
                             onClick: (e) => {
                                 e.preventDefault();
                                 setShowColorPicker(!showColorPicker);
                             },
-                            onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 flex items-center gap-1",
                             title: "Textfarbe",
                             type: "button"
@@ -1264,34 +1283,34 @@
                                 { name: 'Hellblau Hover', color: kerberosColors.secondaryHover },
                                 { name: 'Text Hover', color: kerberosColors.textHover },
                                 { name: 'Grau', color: kerberosColors.gray },
-                                { name: '', color: '#f8f9fa' }, // Spacer
+                                { name: '', color: '#f8f9fa' },
                                 // Abstufungen Blau Zeile 3
                                 { name: 'Blau 80%', color: kerberosColors.primary80 },
                                 { name: 'Blau 60%', color: kerberosColors.primary60 },
                                 { name: 'Blau 40%', color: kerberosColors.primary40 },
                                 { name: 'Blau 20%', color: kerberosColors.primary20 },
-                                { name: '', color: '#f8f9fa' }, // Spacer
+                                { name: '', color: '#f8f9fa' },
                                 // Abstufungen Hellblau Zeile 4
                                 { name: 'Hellblau 80%', color: kerberosColors.secondary80 },
                                 { name: 'Hellblau 60%', color: kerberosColors.secondary60 },
                                 { name: 'Hellblau 40%', color: kerberosColors.secondary40 },
                                 { name: 'Hellblau 20%', color: kerberosColors.secondary20 },
-                                { name: '', color: '#f8f9fa' }, // Spacer
+                                { name: '', color: '#f8f9fa' },
                                 // Abstufungen Text Zeile 5
                                 { name: 'Text 80%', color: kerberosColors.text80 },
                                 { name: 'Text 60%', color: kerberosColors.text60 },
                                 { name: 'Text 40%', color: kerberosColors.text40 },
                                 { name: 'Text 20%', color: kerberosColors.text20 },
-                                { name: '', color: '#f8f9fa' } // Spacer
+                                { name: '', color: '#f8f9fa' }
                             ].map(({ name, color }) =>
                                 React.createElement('button', {
                                     key: color,
+                                    onMouseDown: (e) => e.preventDefault(),
                                     onClick: (e) => {
                                         e.preventDefault();
-                                        applyFormat('foreColor', color, editableRef);
+                                        applyFormatWithSelection('foreColor', color);
                                         setShowColorPicker(false);
                                     },
-                                    onMouseDown: (e) => e.preventDefault(),
                                     className: "w-12 h-12 rounded border-2 border-gray-300 hover:border-gray-500 transition-colors",
                                     style: { backgroundColor: color },
                                     title: name,
@@ -1308,22 +1327,28 @@
                     }, [
                         React.createElement('button', {
                             key: 'linkBtn',
+                            onMouseDown: (e) => {
+                                e.preventDefault();
+                                saveSelection();
+                            },
                             onClick: (e) => {
                                 e.preventDefault();
                                 setShowLinkInput(!showLinkInput);
                             },
-                            onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs",
                             title: "Link einfügen",
                             type: "button"
                         }, '🔗 Link'),
                         React.createElement('button', {
                             key: 'unlinkBtn',
+                            onMouseDown: (e) => {
+                                e.preventDefault();
+                                saveSelection();
+                            },
                             onClick: (e) => {
                                 e.preventDefault();
-                                applyFormat('unlink', null, editableRef);
+                                applyFormatWithSelection('unlink');
                             },
-                            onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs",
                             title: "Link entfernen",
                             type: "button"
@@ -1374,11 +1399,14 @@
                     }, [
                         React.createElement('button', {
                             key: 'removeFormat',
+                            onMouseDown: (e) => {
+                                e.preventDefault();
+                                saveSelection();
+                            },
                             onClick: (e) => {
                                 e.preventDefault();
-                                applyFormat('removeFormat', null, editableRef);
+                                applyFormatWithSelection('removeFormat');
                             },
-                            onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs",
                             title: "Formatierung entfernen",
                             type: "button"
