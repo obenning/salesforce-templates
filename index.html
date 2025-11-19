@@ -959,8 +959,13 @@
                 // Wenn ein Ziel-Element angegeben ist, fokussiere es zuerst
                 if (targetElement) {
                     targetElement.focus();
+                    // Kurze Verzögerung, damit der Fokus wirkt
+                    setTimeout(() => {
+                        document.execCommand(command, false, value);
+                    }, 10);
+                } else {
+                    document.execCommand(command, false, value);
                 }
-                document.execCommand(command, false, value);
             };
 
             // Kerberos Farbpalette
@@ -971,15 +976,25 @@
                 primaryHover: '#294FC5', // Hover Blau
                 secondaryHover: '#007DB7', // Hover Hellblau
                 textHover: '#3A3F42',    // Hover Text
-                // Abstufungen
+                // Abstufungen Primär
                 primary80: '#354FB4',
                 primary60: '#6465C0',
                 primary40: '#939ACC',
                 primary20: '#C1C1D8',
+                // Abstufungen Sekundär
                 secondary80: '#33AADF',
                 secondary60: '#66B8D9',
                 secondary40: '#99C6D2',
-                secondary20: '#CCE3EB'
+                secondary20: '#CCE3EB',
+                // Abstufungen Text
+                text80: '#3E4043',
+                text60: '#5A5C5E',
+                text40: '#77787A',
+                text20: '#939596',
+                // Zusätzliche Farben
+                white: '#FFFFFF',
+                black: '#000000',
+                gray: '#6c757d'
             };
 
             const FormatToolbar = ({ moduleIndex, editableRef }) => {
@@ -989,10 +1004,23 @@
 
                 const insertLink = () => {
                     if (linkUrl && editableRef) {
-                        editableRef.focus();
-                        applyFormat('createLink', linkUrl, editableRef);
-                        setLinkUrl('');
-                        setShowLinkInput(false);
+                        // Sicherstellen, dass Text markiert ist
+                        const selection = window.getSelection();
+                        if (selection.rangeCount > 0) {
+                            editableRef.focus();
+                            // URL validieren und formatieren
+                            let url = linkUrl.trim();
+                            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                                url = 'https://' + url;
+                            }
+                            setTimeout(() => {
+                                document.execCommand('createLink', false, url);
+                                setLinkUrl('');
+                                setShowLinkInput(false);
+                            }, 10);
+                        } else {
+                            alert('Bitte markieren Sie zuerst den Text, der verlinkt werden soll.');
+                        }
                     }
                 };
 
@@ -1048,7 +1076,15 @@
                             key: 'h1',
                             onClick: (e) => {
                                 e.preventDefault();
-                                applyFormat('formatBlock', '<h1>', editableRef);
+                                if (editableRef) {
+                                    editableRef.focus();
+                                    setTimeout(() => {
+                                        const selection = window.getSelection();
+                                        if (selection.rangeCount > 0) {
+                                            document.execCommand('formatBlock', false, 'h1');
+                                        }
+                                    }, 10);
+                                }
                             },
                             onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
@@ -1059,7 +1095,15 @@
                             key: 'h2',
                             onClick: (e) => {
                                 e.preventDefault();
-                                applyFormat('formatBlock', '<h2>', editableRef);
+                                if (editableRef) {
+                                    editableRef.focus();
+                                    setTimeout(() => {
+                                        const selection = window.getSelection();
+                                        if (selection.rangeCount > 0) {
+                                            document.execCommand('formatBlock', false, 'h2');
+                                        }
+                                    }, 10);
+                                }
                             },
                             onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
@@ -1070,7 +1114,15 @@
                             key: 'h3',
                             onClick: (e) => {
                                 e.preventDefault();
-                                applyFormat('formatBlock', '<h3>', editableRef);
+                                if (editableRef) {
+                                    editableRef.focus();
+                                    setTimeout(() => {
+                                        const selection = window.getSelection();
+                                        if (selection.rangeCount > 0) {
+                                            document.execCommand('formatBlock', false, 'h3');
+                                        }
+                                    }, 10);
+                                }
                             },
                             onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
@@ -1081,7 +1133,15 @@
                             key: 'h4',
                             onClick: (e) => {
                                 e.preventDefault();
-                                applyFormat('formatBlock', '<h4>', editableRef);
+                                if (editableRef) {
+                                    editableRef.focus();
+                                    setTimeout(() => {
+                                        const selection = window.getSelection();
+                                        if (selection.rangeCount > 0) {
+                                            document.execCommand('formatBlock', false, 'h4');
+                                        }
+                                    }, 10);
+                                }
                             },
                             onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
@@ -1092,7 +1152,15 @@
                             key: 'h5',
                             onClick: (e) => {
                                 e.preventDefault();
-                                applyFormat('formatBlock', '<h5>', editableRef);
+                                if (editableRef) {
+                                    editableRef.focus();
+                                    setTimeout(() => {
+                                        const selection = window.getSelection();
+                                        if (selection.rangeCount > 0) {
+                                            document.execCommand('formatBlock', false, 'h5');
+                                        }
+                                    }, 10);
+                                }
                             },
                             onMouseDown: (e) => e.preventDefault(),
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
@@ -1164,7 +1232,7 @@
                         showColorPicker && React.createElement('div', {
                             key: 'colorPicker',
                             className: "absolute top-full left-0 mt-1 bg-white border rounded-lg shadow-lg p-3 z-10",
-                            style: { minWidth: '280px' }
+                            style: { minWidth: '350px' }
                         }, [
                             React.createElement('div', {
                                 key: 'colorHeader',
@@ -1183,22 +1251,38 @@
                             ]),
                             React.createElement('div', {
                                 key: 'colorGrid',
-                                className: "grid grid-cols-4 gap-2"
+                                className: "grid grid-cols-5 gap-2"
                             }, [
-                                // Hauptfarben
+                                // Hauptfarben Zeile 1
                                 { name: 'Blau', color: kerberosColors.primary },
                                 { name: 'Hellblau', color: kerberosColors.secondary },
                                 { name: 'Text', color: kerberosColors.text },
+                                { name: 'Weiß', color: kerberosColors.white },
+                                { name: 'Schwarz', color: kerberosColors.black },
+                                // Hover Farben Zeile 2
                                 { name: 'Blau Hover', color: kerberosColors.primaryHover },
-                                // Abstufungen
+                                { name: 'Hellblau Hover', color: kerberosColors.secondaryHover },
+                                { name: 'Text Hover', color: kerberosColors.textHover },
+                                { name: 'Grau', color: kerberosColors.gray },
+                                { name: '', color: '#f8f9fa' }, // Spacer
+                                // Abstufungen Blau Zeile 3
                                 { name: 'Blau 80%', color: kerberosColors.primary80 },
                                 { name: 'Blau 60%', color: kerberosColors.primary60 },
                                 { name: 'Blau 40%', color: kerberosColors.primary40 },
                                 { name: 'Blau 20%', color: kerberosColors.primary20 },
+                                { name: '', color: '#f8f9fa' }, // Spacer
+                                // Abstufungen Hellblau Zeile 4
                                 { name: 'Hellblau 80%', color: kerberosColors.secondary80 },
                                 { name: 'Hellblau 60%', color: kerberosColors.secondary60 },
                                 { name: 'Hellblau 40%', color: kerberosColors.secondary40 },
-                                { name: 'Hellblau 20%', color: kerberosColors.secondary20 }
+                                { name: 'Hellblau 20%', color: kerberosColors.secondary20 },
+                                { name: '', color: '#f8f9fa' }, // Spacer
+                                // Abstufungen Text Zeile 5
+                                { name: 'Text 80%', color: kerberosColors.text80 },
+                                { name: 'Text 60%', color: kerberosColors.text60 },
+                                { name: 'Text 40%', color: kerberosColors.text40 },
+                                { name: 'Text 20%', color: kerberosColors.text20 },
+                                { name: '', color: '#f8f9fa' } // Spacer
                             ].map(({ name, color }) =>
                                 React.createElement('button', {
                                     key: color,
