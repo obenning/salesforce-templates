@@ -1022,28 +1022,40 @@
                 };
 
                 const insertLink = () => {
-                    if (linkUrl && savedSelection) {
-                        restoreSelection();
+                    if (linkUrl && editableRef && savedSelection) {
+                        editableRef.focus();
+                        const selection = window.getSelection();
+                        selection.removeAllRanges();
+                        selection.addRange(savedSelection);
+                        
                         // URL validieren und formatieren
                         let url = linkUrl.trim();
                         if (!url.startsWith('http://') && !url.startsWith('https://')) {
                             url = 'https://' + url;
                         }
+                        
                         setTimeout(() => {
                             document.execCommand('createLink', false, url);
                             setLinkUrl('');
                             setShowLinkInput(false);
                             setSavedSelection(null);
-                        }, 10);
+                        }, 50);
+                    } else if (!savedSelection) {
+                        alert('Bitte markieren Sie zuerst den Text, der verlinkt werden soll.');
                     }
                 };
 
                 const applyFormatWithSelection = (command, value = null) => {
-                    if (savedSelection) {
-                        restoreSelection();
+                    if (editableRef) {
+                        editableRef.focus();
+                        if (savedSelection) {
+                            const selection = window.getSelection();
+                            selection.removeAllRanges();
+                            selection.addRange(savedSelection);
+                        }
                         setTimeout(() => {
                             document.execCommand(command, false, value);
-                        }, 10);
+                        }, 50);
                     }
                 };
 
@@ -1106,13 +1118,15 @@
                     }, [
                         React.createElement('button', {
                             key: 'h1',
-                            onMouseDown: (e) => {
-                                e.preventDefault();
-                                saveSelection();
-                            },
                             onClick: (e) => {
                                 e.preventDefault();
-                                applyFormatWithSelection('formatBlock', 'h1');
+                                if (editableRef) {
+                                    editableRef.focus();
+                                    // Warte bis Fokus gesetzt ist
+                                    setTimeout(() => {
+                                        document.execCommand('formatBlock', false, 'h1');
+                                    }, 100);
+                                }
                             },
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
                             title: "Überschrift 1",
@@ -1120,13 +1134,14 @@
                         }, 'H1'),
                         React.createElement('button', {
                             key: 'h2',
-                            onMouseDown: (e) => {
-                                e.preventDefault();
-                                saveSelection();
-                            },
                             onClick: (e) => {
                                 e.preventDefault();
-                                applyFormatWithSelection('formatBlock', 'h2');
+                                if (editableRef) {
+                                    editableRef.focus();
+                                    setTimeout(() => {
+                                        document.execCommand('formatBlock', false, 'h2');
+                                    }, 100);
+                                }
                             },
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
                             title: "Überschrift 2",
@@ -1134,13 +1149,14 @@
                         }, 'H2'),
                         React.createElement('button', {
                             key: 'h3',
-                            onMouseDown: (e) => {
-                                e.preventDefault();
-                                saveSelection();
-                            },
                             onClick: (e) => {
                                 e.preventDefault();
-                                applyFormatWithSelection('formatBlock', 'h3');
+                                if (editableRef) {
+                                    editableRef.focus();
+                                    setTimeout(() => {
+                                        document.execCommand('formatBlock', false, 'h3');
+                                    }, 100);
+                                }
                             },
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
                             title: "Überschrift 3",
@@ -1148,13 +1164,14 @@
                         }, 'H3'),
                         React.createElement('button', {
                             key: 'h4',
-                            onMouseDown: (e) => {
-                                e.preventDefault();
-                                saveSelection();
-                            },
                             onClick: (e) => {
                                 e.preventDefault();
-                                applyFormatWithSelection('formatBlock', 'h4');
+                                if (editableRef) {
+                                    editableRef.focus();
+                                    setTimeout(() => {
+                                        document.execCommand('formatBlock', false, 'h4');
+                                    }, 100);
+                                }
                             },
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
                             title: "Überschrift 4",
@@ -1162,13 +1179,14 @@
                         }, 'H4'),
                         React.createElement('button', {
                             key: 'h5',
-                            onMouseDown: (e) => {
-                                e.preventDefault();
-                                saveSelection();
-                            },
                             onClick: (e) => {
                                 e.preventDefault();
-                                applyFormatWithSelection('formatBlock', 'h5');
+                                if (editableRef) {
+                                    editableRef.focus();
+                                    setTimeout(() => {
+                                        document.execCommand('formatBlock', false, 'h5');
+                                    }, 100);
+                                }
                             },
                             className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
                             title: "Überschrift 5",
