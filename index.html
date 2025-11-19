@@ -1150,7 +1150,6 @@
                 }));
                 
                 setCurrentTemplate(finalName);
-                alert(`Template wurde als "${finalName}" kopiert!`);
             };
 
             // Modul zwischen Templates kopieren
@@ -1169,8 +1168,6 @@
                         }
                     }
                 }));
-                
-                alert(`Modul "${name}" wurde zu "${targetTemplate}" kopiert!`);
             };
 
             // Modul in Bibliothek bearbeiten
@@ -1199,7 +1196,6 @@
                     setNewModuleContent('');
                     setShowNewModuleInput(false);
                     
-                    alert('Modul wurde aktualisiert!');
                 }
             };
 
@@ -1521,10 +1517,7 @@
                                             }, React.createElement(Icons.Edit)),
                                             React.createElement('button', {
                                                 key: `add-${moduleName}`,
-                                                onClick: () => {
-                                                    addModuleToTemplate(moduleName);
-                                                    alert(`Modul "${moduleName}" zum Template hinzugefügt!`);
-                                                },
+                                                onClick: () => addModuleToTemplate(moduleName),
                                                 className: "p-1 bg-green-600 text-white rounded hover:bg-green-700",
                                                 title: "Zu Template hinzufügen"
                                             }, React.createElement(Icons.PlusCircle))
