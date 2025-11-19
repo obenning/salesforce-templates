@@ -1,0 +1,1770 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salesforce Template Editor</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            font-family: system-ui, -apple-system, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+        }
+        .icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .copy-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem;
+            z-index: 10;
+            min-width: 12rem;
+        }
+        .copy-dropdown-parent:hover .copy-dropdown {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef } = React;
+
+        // Einfache Icon-Komponenten (Unicode)
+        const Icons = {
+            Copy: () => React.createElement('span', { className: 'icon' }, '📋'),
+            Plus: () => React.createElement('span', { className: 'icon' }, '+'),
+            Edit: () => React.createElement('span', { className: 'icon' }, '✏️'),
+            Eye: () => React.createElement('span', { className: 'icon' }, '👁️'),
+            Download: () => React.createElement('span', { className: 'icon' }, '⬇️'),
+            Upload: () => React.createElement('span', { className: 'icon' }, '⬆️'),
+            Trash: () => React.createElement('span', { className: 'icon' }, '🗑️'),
+            Package: () => React.createElement('span', { className: 'icon' }, '📦'),
+            PlusCircle: () => React.createElement('span', { className: 'icon' }, '➕'),
+            ArrowUp: () => React.createElement('span', { className: 'icon' }, '⬆️'),
+            ArrowDown: () => React.createElement('span', { className: 'icon' }, '⬇️'),
+            Clone: () => React.createElement('span', { className: 'icon' }, '👥'),
+            Format: () => React.createElement('span', { className: 'icon' }, '🎨')
+        };
+
+        const SalesforceTemplateEditor = () => {
+            // Modul-Bibliothek
+            const [modules, setModules] = useState({
+                'Header mit Logo': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="background-color: #063AA8; padding: 20px;">
+						<table cellpadding="0" cellspacing="0" width="100%">
+							<tbody>
+								<tr>
+									<td><img alt="Kerberos-Logo" src="https://go.kerberos-compliance.com/l/904532/2021-01-28/3lqr/904532/1615539833EjZICKBp/Logo.png" style="width: 160px; height: 32px;" title="Kerberos-Logo" /></td>
+									<td align="right">&nbsp;</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Header Einfach': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 20px;">
+						<img alt="Logo" src="https://go.kerberos-compliance.com/l/904532/2021-01-28/3lqr/904532/1615539833EjZICKBp/Logo.png" style="width: 140px; height: auto;" title="Logo" />
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Header mit Navigation': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 20px;">
+						<table cellpadding="0" cellspacing="0" width="100%">
+							<tbody>
+								<tr>
+									<td><img alt="Logo" src="https://go.kerberos-compliance.com/l/904532/2021-01-28/3lqr/904532/1615539833EjZICKBp/Logo.png" style="width: 120px;" title="Logo" /></td>
+									<td align="right">
+									<a href="#" style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 14px; text-decoration: none;">Home</a> | 
+									<a href="#" style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 14px; text-decoration: none;">Services</a> | 
+									<a href="#" style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 14px; text-decoration: none;">Kontakt</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Hauptüberschrift': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<h1 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 22px;">Ihr Titel hier</h1>
+						<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;"><strong>{{#if Recipient.FirstName}}Guten Tag {{{Recipient.FirstName}}} {{{Recipient.LastName}}},{{else}}Guten Tag,{{/if}}</strong></p>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Textblock': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">Ihr Text hier. Sie können diesen Text über mehrere Absätze erweitern und <strong>wichtige Punkte hervorheben</strong>.</p>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Zitat/Testimonial': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<table cellpadding="0" cellspacing="0" style="background-color: #f1f3f5; width: 100%;">
+							<tbody>
+								<tr>
+									<td style="padding: 20px;">
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #495057; font-size: 16px; font-style: italic;">&quot;Ein großartiger Service! Sehr empfehlenswert für alle, die professionelle Compliance-Lösungen suchen.&quot;</p>
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 14px; font-weight: bold;">- Max Mustermann, CEO</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Info-Box': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<table cellpadding="0" cellspacing="0" style="background-color: #f1f3f5; width: 100%;">
+							<tbody>
+								<tr>
+									<td style="padding: 15px;">
+									<h3 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 18px;">Info-Box Titel</h3>
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">Wichtige Informationen in hervorgehobener Box.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Erfolg-Box': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<table cellpadding="0" cellspacing="0" style="background-color: #d4edda; width: 100%;">
+							<tbody>
+								<tr>
+									<td style="padding: 15px;">
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #155724; font-size: 14px;"><strong>✓ Erfolgreich:</strong> Ihre Aktion wurde bestätigt.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Warnung-Box': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<table cellpadding="0" cellspacing="0" style="background-color: #fff3cd; width: 100%;">
+							<tbody>
+								<tr>
+									<td style="padding: 15px;">
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #856404; font-size: 14px;"><strong>⚠ Wichtig:</strong> Hier steht eine wichtige Warnung oder ein Hinweis.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Aufzählungsliste': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<h3 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 16px;">Listenüberschrift</h3>
+						<ul style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">
+							<li><strong>Punkt 1:</strong> Beschreibung</li>
+							<li><strong>Punkt 2:</strong> Beschreibung</li>
+							<li><strong>Punkt 3:</strong> Beschreibung</li>
+						</ul>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Nummerierte Liste': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<h3 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 16px;">Schritt-für-Schritt</h3>
+						<table cellpadding="0" cellspacing="0" width="100%">
+							<tbody>
+								<tr>
+									<td style="width: 30px; vertical-align: top; font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 16px; font-weight: bold;">1.</td>
+									<td style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">Erster Schritt der Anleitung</td>
+								</tr>
+								<tr>
+									<td style="width: 30px; vertical-align: top; font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 16px; font-weight: bold;">2.</td>
+									<td style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">Zweiter Schritt der Anleitung</td>
+								</tr>
+								<tr>
+									<td style="width: 30px; vertical-align: top; font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 16px; font-weight: bold;">3.</td>
+									<td style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">Dritter Schritt der Anleitung</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Primary Button': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 20px;">
+						<table cellpadding="0" cellspacing="0" style="background-color: #009CE6;">
+							<tbody>
+								<tr>
+									<td style="padding: 12px 25px;"><a href="#LINK_HIER" style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #ffffff; font-size: 14px; text-decoration: none; font-weight: bold;">Button Text &rarr;</a></td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Secondary Button': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 20px;">
+						<table cellpadding="0" cellspacing="0" style="background-color: transparent; width: auto;">
+							<tbody>
+								<tr>
+									<td style="padding: 10px 20px; border: 2px solid #009CE6;"><a href="#LINK_HIER" style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #009CE6; font-size: 14px; text-decoration: none; font-weight: bold;">Mehr erfahren</a></td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Button-Gruppe': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 20px;">
+						<table cellpadding="0" cellspacing="0" width="100%">
+							<tbody>
+								<tr>
+									<td align="center" style="padding: 10px;">
+									<table cellpadding="0" cellspacing="0" style="background-color: #009CE6;">
+										<tbody>
+											<tr>
+												<td style="padding: 12px 20px;"><a href="#LINK1" style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #ffffff; font-size: 14px; text-decoration: none; font-weight: bold;">Hauptaktion</a></td>
+											</tr>
+										</tbody>
+									</table>
+									</td>
+									<td align="center" style="padding: 10px;">
+									<table cellpadding="0" cellspacing="0" style="background-color: transparent;">
+										<tbody>
+											<tr>
+												<td style="padding: 10px 18px; border: 2px solid #009CE6;"><a href="#LINK2" style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #009CE6; font-size: 14px; text-decoration: none; font-weight: bold;">Alternative</a></td>
+											</tr>
+										</tbody>
+									</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Zwei-Spalten Layout': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<table cellpadding="0" cellspacing="0" width="100%">
+							<tbody>
+								<tr>
+									<td style="width: 50%; padding: 10px; vertical-align: top;">
+									<h4 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 16px;">Linke Spalte</h4>
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">Inhalt der linken Spalte</p>
+									</td>
+									<td style="width: 50%; padding: 10px; vertical-align: top;">
+									<h4 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 16px;">Rechte Spalte</h4>
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">Inhalt der rechten Spalte</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Drei-Spalten Layout': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<table cellpadding="0" cellspacing="0" width="100%">
+							<tbody>
+								<tr>
+									<td style="width: 33%; padding: 8px; vertical-align: top;">
+									<h4 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 14px;">Spalte 1</h4>
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 12px;">Inhalt</p>
+									</td>
+									<td style="width: 33%; padding: 8px; vertical-align: top;">
+									<h4 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 14px;">Spalte 2</h4>
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 12px;">Inhalt</p>
+									</td>
+									<td style="width: 33%; padding: 8px; vertical-align: top;">
+									<h4 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 14px;">Spalte 3</h4>
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 12px;">Inhalt</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Termin-Box': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<table cellpadding="0" cellspacing="0" style="background-color: #f1f3f5; width: 100%;">
+							<tbody>
+								<tr>
+									<td style="padding: 15px;">
+									<h3 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 18px;">📅 Termine</h3>
+									<ul style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">
+										<li><strong>Datum 1:</strong> Beschreibung</li>
+										<li><strong>Datum 2:</strong> Beschreibung</li>
+									</ul>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Event-Karte': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<table cellpadding="0" cellspacing="0" style="background-color: #063AA8; width: 100%;">
+							<tbody>
+								<tr>
+									<td style="padding: 20px;">
+									<table cellpadding="0" cellspacing="0" width="100%">
+										<tbody>
+											<tr>
+												<td style="width: 80px; vertical-align: top;">
+												<div style="background-color: #ffffff; padding: 10px; text-align: center;">
+													<span style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 24px; font-weight: bold;">15</span><br>
+													<span style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 12px;">MÄR</span>
+												</div>
+												</td>
+												<td style="padding: 0 15px; vertical-align: top;">
+												<h3 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #ffffff; font-size: 18px;">Webinar: Compliance Update</h3>
+												<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #adb5bd; font-size: 14px;">9:00 - 10:30 Uhr | Online</p>
+												<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #ffffff; font-size: 14px;">Wichtige Updates zu aktuellen Compliance-Themen.</p>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Preis-Box': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<table cellpadding="0" cellspacing="0" style="background-color: #f1f3f5; width: 100%;">
+							<tbody>
+								<tr>
+									<td style="padding: 20px; text-align: center;">
+									<h3 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 18px;">Schulung Basis</h3>
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #009CE6; font-size: 32px; font-weight: bold;">299€</p>
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #6c757d; font-size: 12px;"><s>399€</s> pro Person</p>
+									<ul style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px; text-align: left;">
+										<li>✓ Online-Zugang</li>
+										<li>✓ Zertifikat</li>
+										<li>✓ 2 Jahre gültig</li>
+									</ul>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Countdown': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<h3 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 18px; text-align: center;">⏰ Noch 3 Tage bis zur Anmeldung!</h3>
+						<table cellpadding="0" cellspacing="0" width="100%">
+							<tbody>
+								<tr>
+									<td style="width: 25%; text-align: center; padding: 10px;">
+									<div style="background-color: #009CE6; padding: 15px; color: #ffffff;">
+										<span style="font-family: Tahoma,Arial,Helvetica,sans-serif; font-size: 24px; font-weight: bold;">03</span><br>
+										<span style="font-family: Tahoma,Arial,Helvetica,sans-serif; font-size: 12px;">TAGE</span>
+									</div>
+									</td>
+									<td style="width: 25%; text-align: center; padding: 10px;">
+									<div style="background-color: #009CE6; padding: 15px; color: #ffffff;">
+										<span style="font-family: Tahoma,Arial,Helvetica,sans-serif; font-size: 24px; font-weight: bold;">14</span><br>
+										<span style="font-family: Tahoma,Arial,Helvetica,sans-serif; font-size: 12px;">STD</span>
+									</div>
+									</td>
+									<td style="width: 25%; text-align: center; padding: 10px;">
+									<div style="background-color: #009CE6; padding: 15px; color: #ffffff;">
+										<span style="font-family: Tahoma,Arial,Helvetica,sans-serif; font-size: 24px; font-weight: bold;">27</span><br>
+										<span style="font-family: Tahoma,Arial,Helvetica,sans-serif; font-size: 12px;">MIN</span>
+									</div>
+									</td>
+									<td style="width: 25%; text-align: center; padding: 10px;">
+									<div style="background-color: #009CE6; padding: 15px; color: #ffffff;">
+										<span style="font-family: Tahoma,Arial,Helvetica,sans-serif; font-size: 24px; font-weight: bold;">45</span><br>
+										<span style="font-family: Tahoma,Arial,Helvetica,sans-serif; font-size: 12px;">SEK</span>
+									</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Social Media': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 20px; text-align: center;">
+						<h3 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 16px;">Folgen Sie uns</h3>
+						<table cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+							<tbody>
+								<tr>
+									<td style="padding: 10px;">
+									<a href="#" style="display: inline-block; width: 40px; height: 40px; background-color: #063AA8; color: #ffffff; text-decoration: none; font-family: Tahoma,Arial,Helvetica,sans-serif; font-size: 20px; font-weight: bold; text-align: center; padding: 10px;">f</a>
+									</td>
+									<td style="padding: 10px;">
+									<a href="#" style="display: inline-block; width: 40px; height: 40px; background-color: #009CE6; color: #ffffff; text-decoration: none; font-family: Tahoma,Arial,Helvetica,sans-serif; font-size: 20px; font-weight: bold; text-align: center; padding: 10px;">in</a>
+									</td>
+									<td style="padding: 10px;">
+									<a href="#" style="display: inline-block; width: 40px; height: 40px; background-color: #6c757d; color: #ffffff; text-decoration: none; font-family: Tahoma,Arial,Helvetica,sans-serif; font-size: 20px; font-weight: bold; text-align: center; padding: 10px;">X</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Kontakt-Info': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<h3 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 16px;">📞 Kontakt</h3>
+						<table cellpadding="0" cellspacing="0" width="100%">
+							<tbody>
+								<tr>
+									<td style="width: 50%; vertical-align: top; padding: 10px;">
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;"><strong>Telefon:</strong><br>+49 221 123456</p>
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;"><strong>E-Mail:</strong><br>info@kerberos-compliance.com</p>
+									</td>
+									<td style="width: 50%; vertical-align: top; padding: 10px;">
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;"><strong>Adresse:</strong><br>Im Zollhafen 24<br>50678 Köln</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Trennlinie': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 20px;">
+						<div style="width: 100%; height: 1px; background-color: #dee2e6;"></div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Abstandhalter': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 30px;">
+						&nbsp;
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Newsletter Anmeldung': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<table cellpadding="0" cellspacing="0" style="background-color: #063AA8; width: 100%;">
+							<tbody>
+								<tr>
+									<td style="padding: 20px; text-align: center;">
+									<h3 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #ffffff; font-size: 18px;">📧 Newsletter abonnieren</h3>
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #adb5bd; font-size: 14px;">Bleiben Sie über unsere neuesten Updates informiert</p>
+									<table cellpadding="0" cellspacing="0" style="background-color: #009CE6; margin: 10px auto;">
+										<tbody>
+											<tr>
+												<td style="padding: 10px 20px;"><a href="#NEWSLETTER_LINK" style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #ffffff; font-size: 14px; text-decoration: none; font-weight: bold;">Jetzt anmelden →</a></td>
+											</tr>
+										</tbody>
+									</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Rechtlicher Hinweis': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #6c757d; font-size: 12px;">Diese E-Mail wurde an {{{Recipient.Email}}} gesendet. Falls Sie diese E-Mail fälschlicherweise erhalten haben oder keine weiteren E-Mails wünschen, können Sie sich <a href="#UNSUBSCRIBE" style="color: #009CE6;">hier abmelden</a>.</p>
+						<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #6c757d; font-size: 12px;">© 2025 Kerberos Compliance. Alle Rechte vorbehalten. | <a href="#IMPRESSUM" style="color: #009CE6;">Impressum</a> | <a href="#DATENSCHUTZ" style="color: #009CE6;">Datenschutz</a></p>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                'Footer': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="background-color: #212529; padding: 20px;">
+						<table cellpadding="0" cellspacing="0" width="100%">
+							<tbody>
+								<tr>
+									<td style="text-align: center;"><img alt="Kerberos Logo" src="https://go.kerberos-compliance.com/l/904532/2021-01-28/3lqr/904532/1615539833EjZICKBp/Logo.png" style="width: 160px; height: 32px;" title="Kerberos Logo" /></td>
+								</tr>
+								<tr>
+									<td style="text-align: center;">
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #adb5bd; font-size: 12px;">Kerberos Compliance-Managementsysteme GmbH<br />
+									Im Zollhafen 24, 50678 K&ouml;ln</p>
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #6c757d; font-size: 10px;">Sie m&ouml;chten keine weiteren Emails erhalten? Hier&nbsp;{{{Recipient.jrsl_ul_Unsubscribe_Link_Lead__c}}}&nbsp;{{{Recipient.jrsl_ul_Unsubscribe_Link_Contact__c}}}</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`
+            });
+
+            // Templates bestehen aus Modulen
+            const [templates, setTemplates] = useState({
+                'Bayern Schulung': {
+                    modules: ['Header mit Logo', 'Hauptüberschrift', 'Termin-Box', 'Primary Button', 'Aufzählungsliste', 'Footer'],
+                    customContent: {
+                        'Hauptüberschrift': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<h1 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 22px;">Zertifikate-Prüfung für Bayern erforderlich</h1>
+						<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;"><strong>{{#if Recipient.FirstName}}Guten Tag {{{Recipient.FirstName}}} {{{Recipient.LastName}}},{{else}}Guten Tag,{{/if}}</strong></p>
+						<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">die Zertifikate für Ihre Präventionsschulungen für Servicekräfte Sportwette und Spielhalle <strong>in Bayern</strong> sind 2 Jahre gültig. <strong>Prüfen Sie jetzt die Gültigkeit Ihrer Mitarbeiter-Zertifikate.</strong></p>
+						<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">Buchen Sie bei Bedarf „Online-Präventionsschulungen für Servicekräfte Sportwette &amp; Spielhalle" bei Kerberos Compliance in Kooperation mit der GSP-Akademie.</p>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                        'Termin-Box': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<table cellpadding="0" cellspacing="0" style="background-color: #f1f3f5; width: 100%;">
+							<tbody>
+								<tr>
+									<td style="padding: 15px;">
+									<h3 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 18px;">Verfügbare Schulungstermine</h3>
+									<ul style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">
+										<li><strong>Di, 30.09.2025 &amp; Mi, 01.10.2025</strong> – jeweils von 9-13 Uhr</li>
+										<li><strong>Sa, 11.10.2025 &amp; So, 12.10.2025</strong> – jeweils von 9-13 Uhr</li>
+									</ul>
+									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;"><strong>Wichtig:</strong> Die Online-Präventionsschulungen sind ausschließlich als Auffrischungsschulungen erlaubt.</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                        'Primary Button': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 20px;">
+						<table cellpadding="0" cellspacing="0" style="background-color: #009CE6;">
+							<tbody>
+								<tr>
+									<td style="padding: 12px 25px;"><a href="https://form.jotform.com/252654679241060" style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #ffffff; font-size: 14px; text-decoration: none; font-weight: bold;">Jetzt buchen &rarr;</a></td>
+								</tr>
+							</tbody>
+						</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`,
+                        'Aufzählungsliste': `<table cellpadding="0" cellspacing="0" width="100%">
+	<tbody>
+		<tr>
+			<td align="center" style="background-color: #f8f9fa;">
+			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+				<tbody>
+					<tr>
+						<td style="padding: 15px;">
+						<h3 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 16px;">Warum Kerberos Compliance?</h3>
+						<ul style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">
+							<li>Unsere Schulungen sind <strong>in Bayern anerkannt</strong></li>
+							<li>Durchführung von <strong>Glücksspielexperten</strong></li>
+							<li>Flexible Online-Termine</li>
+							<li>Kooperation mit der GSP-Akademie</li>
+						</ul>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
+</table>`
+                    }
+                }
+            });
+
+            const [currentTemplate, setCurrentTemplate] = useState('Bayern Schulung');
+            const [editablePreview, setEditablePreview] = useState(false);
+            const [previewMode, setPreviewMode] = useState(false);
+            const [showModuleLibrary, setShowModuleLibrary] = useState(false);
+            const [newTemplateName, setNewTemplateName] = useState('');
+            const [newModuleName, setNewModuleName] = useState('');
+            const [newModuleContent, setNewModuleContent] = useState('');
+            const [showNewTemplateInput, setShowNewTemplateInput] = useState(false);
+            const [showNewModuleInput, setShowNewModuleInput] = useState(false);
+            const [editingModule, setEditingModule] = useState(null);
+            const [editors, setEditors] = useState({});
+            const [showEditor, setShowEditor] = useState({});
+            const [activeTextarea, setActiveTextarea] = useState(null);
+            const fileInputRef = useRef(null);
+
+            // Funktion zum Kopieren in Zwischenablage
+            const copyToClipboard = async (text, part) => {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    const button = document.querySelector(`[data-copy="${part}"]`);
+                    if (button) {
+                        const originalText = button.innerHTML;
+                        button.innerHTML = '✓ Kopiert!';
+                        button.className = button.className.replace('bg-blue-600', 'bg-green-600');
+                        setTimeout(() => {
+                            button.innerHTML = originalText;
+                            button.className = button.className.replace('bg-green-600', 'bg-blue-600');
+                        }, 2000);
+                    }
+                } catch (err) {
+                    console.error('Fehler beim Kopieren:', err);
+                    alert('Code wurde kopiert!');
+                }
+            };
+
+            // Template-Inhalt generieren
+            const getTemplateContent = () => {
+                const template = templates[currentTemplate];
+                if (!template) return [];
+                
+                return template.modules.map((moduleName, index) => ({
+                    name: moduleName,
+                    content: template.customContent?.[moduleName] || modules[moduleName] || '',
+                    index
+                }));
+            };
+
+            // Modul zu Template hinzufügen
+            const addModuleToTemplate = (moduleName) => {
+                setTemplates(prev => ({
+                    ...prev,
+                    [currentTemplate]: {
+                        ...prev[currentTemplate],
+                        modules: [...(prev[currentTemplate]?.modules || []), moduleName]
+                    }
+                }));
+            };
+
+            // Modul aus Template entfernen
+            const removeModuleFromTemplate = (moduleIndex) => {
+                setTemplates(prev => {
+                    const template = prev[currentTemplate];
+                    const newModules = template.modules.filter((_, index) => index !== moduleIndex);
+                    const newCustomContent = { ...template.customContent };
+                    
+                    const removedModule = template.modules[moduleIndex];
+                    if (newCustomContent[removedModule]) {
+                        delete newCustomContent[removedModule];
+                    }
+                    
+                    return {
+                        ...prev,
+                        [currentTemplate]: {
+                            ...template,
+                            modules: newModules,
+                            customContent: newCustomContent
+                        }
+                    };
+                });
+            };
+
+            // Modul nach oben verschieben
+            const moveModuleUp = (moduleIndex) => {
+                if (moduleIndex === 0) return; // Bereits ganz oben
+                
+                setTemplates(prev => {
+                    const template = prev[currentTemplate];
+                    const newModules = [...template.modules];
+                    
+                    // Elemente tauschen
+                    [newModules[moduleIndex - 1], newModules[moduleIndex]] = 
+                    [newModules[moduleIndex], newModules[moduleIndex - 1]];
+                    
+                    return {
+                        ...prev,
+                        [currentTemplate]: {
+                            ...template,
+                            modules: newModules
+                        }
+                    };
+                });
+            };
+
+            // Modul nach unten verschieben
+            const moveModuleDown = (moduleIndex) => {
+                const template = templates[currentTemplate];
+                if (moduleIndex === template.modules.length - 1) return; // Bereits ganz unten
+                
+                setTemplates(prev => {
+                    const template = prev[currentTemplate];
+                    const newModules = [...template.modules];
+                    
+                    // Elemente tauschen
+                    [newModules[moduleIndex], newModules[moduleIndex + 1]] = 
+                    [newModules[moduleIndex + 1], newModules[moduleIndex]];
+                    
+                    return {
+                        ...prev,
+                        [currentTemplate]: {
+                            ...template,
+                            modules: newModules
+                        }
+                    };
+                });
+            };
+
+            // Modul-Inhalt aktualisieren
+            const updateModuleContent = (moduleName, content) => {
+                setTemplates(prev => ({
+                    ...prev,
+                    [currentTemplate]: {
+                        ...prev[currentTemplate],
+                        customContent: {
+                            ...prev[currentTemplate]?.customContent,
+                            [moduleName]: content
+                        }
+                    }
+                }));
+            };
+
+            // Neues Template hinzufügen
+            const addNewTemplate = () => {
+                if (newTemplateName && !templates[newTemplateName]) {
+                    setTemplates(prev => ({
+                        ...prev,
+                        [newTemplateName]: {
+                            modules: [],
+                            customContent: {}
+                        }
+                    }));
+                    setCurrentTemplate(newTemplateName);
+                    setNewTemplateName('');
+                    setShowNewTemplateInput(false);
+                }
+            };
+
+            // Neues Modul zur Bibliothek hinzufügen
+            const addNewModule = () => {
+                if (newModuleName && newModuleContent && !modules[newModuleName]) {
+                    setModules(prev => ({
+                        ...prev,
+                        [newModuleName]: newModuleContent
+                    }));
+                    setNewModuleName('');
+                    setNewModuleContent('');
+                    setShowNewModuleInput(false);
+                }
+            };
+
+            // Template löschen
+            const deleteTemplate = (templateName) => {
+                if (Object.keys(templates).length > 1) {
+                    const newTemplates = { ...templates };
+                    delete newTemplates[templateName];
+                    setTemplates(newTemplates);
+                    
+                    if (currentTemplate === templateName) {
+                        setCurrentTemplate(Object.keys(newTemplates)[0]);
+                    }
+                }
+            };
+
+            // Template kopieren
+            const copyTemplate = (templateName) => {
+                const copyName = `${templateName} (Kopie)`;
+                let finalName = copyName;
+                let counter = 1;
+                
+                // Eindeutigen Namen finden
+                while (templates[finalName]) {
+                    finalName = `${copyName} ${counter}`;
+                    counter++;
+                }
+                
+                setTemplates(prev => ({
+                    ...prev,
+                    [finalName]: {
+                        modules: [...prev[templateName].modules],
+                        customContent: { ...prev[templateName].customContent }
+                    }
+                }));
+                
+                setCurrentTemplate(finalName);
+                alert(`Template wurde als "${finalName}" kopiert!`);
+            };
+
+            // Modul zwischen Templates kopieren
+            const copyModuleToTemplate = (moduleData, targetTemplate) => {
+                const { name, content } = moduleData;
+                
+                setTemplates(prev => ({
+                    ...prev,
+                    [targetTemplate]: {
+                        ...prev[targetTemplate],
+                        modules: [...(prev[targetTemplate]?.modules || []), name],
+                        customContent: {
+                            ...prev[targetTemplate]?.customContent,
+                            [name]: content
+                        }
+                    }
+                }));
+                
+                alert(`Modul "${name}" wurde zu "${targetTemplate}" kopiert!`);
+            };
+
+            // Modul in Bibliothek bearbeiten
+            const editModuleInLibrary = (moduleName) => {
+                setEditingModule(moduleName);
+                setNewModuleName(moduleName);
+                setNewModuleContent(modules[moduleName]);
+                setShowNewModuleInput(true);
+            };
+
+            // Modul in Bibliothek aktualisieren
+            const updateModuleInLibrary = () => {
+                if (editingModule && newModuleName && newModuleContent) {
+                    const newModules = { ...modules };
+                    
+                    // Wenn Name geändert wurde, altes Modul löschen
+                    if (editingModule !== newModuleName) {
+                        delete newModules[editingModule];
+                    }
+                    
+                    newModules[newModuleName] = newModuleContent;
+                    setModules(newModules);
+                    
+                    setEditingModule(null);
+                    setNewModuleName('');
+                    setNewModuleContent('');
+                    setShowNewModuleInput(false);
+                    
+                    alert('Modul wurde aktualisiert!');
+                }
+            };
+
+            // HTML-Code-Editor mit Syntax-Highlighting (einfach)
+            const toggleCodeEditor = (moduleIndex) => {
+                setShowEditor(prev => ({
+                    ...prev, 
+                    [moduleIndex]: !prev[moduleIndex]
+                }));
+            };
+
+            // Textinhalt aus HTML extrahieren für Vorschau
+            const extractTextContent = (htmlString) => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlString;
+                return tempDiv.textContent || tempDiv.innerText || '';
+            };
+            // Export/Import Funktionen
+            const exportData = () => {
+                const dataStr = JSON.stringify({ templates, modules }, null, 2);
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', 'salesforce-templates-and-modules.json');
+                linkElement.click();
+            };
+
+            const importData = (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const imported = JSON.parse(e.target.result);
+                            if (imported.templates) setTemplates(prev => ({ ...prev, ...imported.templates }));
+                            if (imported.modules) setModules(prev => ({ ...prev, ...imported.modules }));
+                            alert('Templates und Module erfolgreich importiert!');
+                        } catch (err) {
+                            alert('Fehler beim Importieren der Datei');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+
+            const templateContent = getTemplateContent();
+
+            return React.createElement('div', {
+                className: "min-h-screen bg-gray-50 p-4"
+            }, [
+                React.createElement('div', {
+                    key: 'container',
+                    className: "max-w-7xl mx-auto"
+                }, [
+                    // Header
+                    React.createElement('div', {
+                        key: 'header',
+                        className: "bg-white rounded-lg shadow-sm p-6 mb-6"
+                    }, [
+                        React.createElement('div', {
+                            key: 'headerContent',
+                            className: "flex items-center justify-between flex-wrap gap-4"
+                        }, [
+                            React.createElement('div', { key: 'headerText' }, [
+                                React.createElement('h1', {
+                                    key: 'title',
+                                    className: "text-3xl font-bold text-gray-900"
+                                }, '📧 Salesforce Template Editor'),
+                                React.createElement('p', {
+                                    key: 'subtitle',
+                                    className: "text-gray-600 mt-2"
+                                }, 'Standalone Version - Lokale Nutzung ohne Internetverbindung')
+                            ]),
+                            React.createElement('div', {
+                                key: 'headerButtons',
+                                className: "flex gap-2 flex-wrap"
+                            }, [
+                                React.createElement('button', {
+                                    key: 'moduleBtn',
+                                    onClick: () => setShowModuleLibrary(!showModuleLibrary),
+                                    className: `flex items-center gap-2 px-4 py-2 rounded-lg font-medium ${
+                                        showModuleLibrary ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700'
+                                    }`
+                                }, [
+                                    React.createElement(Icons.Package, { key: 'packageIcon' }),
+                                    'Module'
+                                ]),
+                                React.createElement('button', {
+                                    key: 'editBtn',
+                                    onClick: () => setEditablePreview(!editablePreview),
+                                    className: `flex items-center gap-2 px-4 py-2 rounded-lg font-medium ${
+                                        editablePreview ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'
+                                    }`
+                                }, [
+                                    React.createElement(Icons.Edit, { key: 'editIcon' }),
+                                    'Bearbeitbar'
+                                ]),
+                                React.createElement('button', {
+                                    key: 'previewBtn',
+                                    onClick: () => setPreviewMode(!previewMode),
+                                    className: `flex items-center gap-2 px-4 py-2 rounded-lg font-medium ${
+                                        previewMode ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
+                                    }`
+                                }, [
+                                    React.createElement(Icons.Eye, { key: 'eyeIcon' }),
+                                    'Preview'
+                                ])
+                            ])
+                        ])
+                    ]),
+
+                    // Main Grid
+                    React.createElement('div', {
+                        key: 'mainGrid',
+                        className: "grid grid-cols-1 lg:grid-cols-4 gap-6"
+                    }, [
+                        // Sidebar
+                        React.createElement('div', {
+                            key: 'sidebar',
+                            className: "lg:col-span-1 space-y-6"
+                        }, [
+                            // Templates Section
+                            React.createElement('div', {
+                                key: 'templates',
+                                className: "bg-white rounded-lg shadow-sm p-4"
+                            }, [
+                                React.createElement('div', {
+                                    key: 'templatesHeader',
+                                    className: "flex items-center justify-between mb-4"
+                                }, [
+                                    React.createElement('h2', {
+                                        key: 'templatesTitle',
+                                        className: "text-lg font-semibold"
+                                    }, '📄 Templates'),
+                                    React.createElement('button', {
+                                        key: 'addTemplateBtn',
+                                        onClick: () => setShowNewTemplateInput(!showNewTemplateInput),
+                                        className: "p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                    }, React.createElement(Icons.Plus))
+                                ]),
+
+                                showNewTemplateInput && React.createElement('div', {
+                                    key: 'newTemplateInput',
+                                    className: "mb-4 p-3 bg-gray-50 rounded-lg"
+                                }, [
+                                    React.createElement('input', {
+                                        key: 'templateInput',
+                                        type: "text",
+                                        placeholder: "Template Name",
+                                        value: newTemplateName,
+                                        onChange: (e) => setNewTemplateName(e.target.value),
+                                        className: "w-full p-2 border rounded mb-2 text-sm",
+                                        onKeyPress: (e) => e.key === 'Enter' && addNewTemplate()
+                                    }),
+                                    React.createElement('div', {
+                                        key: 'templateInputButtons',
+                                        className: "flex gap-2"
+                                    }, [
+                                        React.createElement('button', {
+                                            key: 'addBtn',
+                                            onClick: addNewTemplate,
+                                            className: "px-3 py-1 bg-green-600 text-white rounded text-sm"
+                                        }, 'Hinzufügen'),
+                                        React.createElement('button', {
+                                            key: 'cancelBtn',
+                                            onClick: () => setShowNewTemplateInput(false),
+                                            className: "px-3 py-1 bg-gray-400 text-white rounded text-sm"
+                                        }, 'Abbrechen')
+                                    ])
+                                ]),
+
+                                // Template List
+                                React.createElement('div', {
+                                    key: 'templateList',
+                                    className: "space-y-2 mb-4"
+                                }, Object.keys(templates).map(templateName => 
+                                    React.createElement('div', {
+                                        key: templateName,
+                                        className: "flex items-center justify-between"
+                                    }, [
+                                        React.createElement('button', {
+                                            key: `select-${templateName}`,
+                                            onClick: () => setCurrentTemplate(templateName),
+                                            className: `flex-1 text-left p-3 rounded-lg text-sm ${
+                                                currentTemplate === templateName 
+                                                    ? 'bg-blue-100 text-blue-800 border-2 border-blue-200' 
+                                                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                                            }`
+                                        }, templateName),
+                                        React.createElement('div', {
+                                            key: `actions-${templateName}`,
+                                            className: "flex gap-1 ml-2"
+                                        }, [
+                                            React.createElement('button', {
+                                                key: `copy-${templateName}`,
+                                                onClick: () => copyTemplate(templateName),
+                                                className: "p-2 text-blue-600 hover:bg-blue-50 rounded",
+                                                title: "Template kopieren"
+                                            }, React.createElement(Icons.Clone)),
+                                            Object.keys(templates).length > 1 && React.createElement('button', {
+                                                key: `delete-${templateName}`,
+                                                onClick: () => {
+                                                    if(confirm(`Template "${templateName}" wirklich löschen?`)) {
+                                                        deleteTemplate(templateName);
+                                                    }
+                                                },
+                                                className: "p-2 text-red-600 hover:bg-red-50 rounded",
+                                                title: "Template löschen"
+                                            }, React.createElement(Icons.Trash))
+                                        ])
+                                    ])
+                                )),
+
+                                // Export/Import
+                                React.createElement('div', {
+                                    key: 'exportImport',
+                                    className: "space-y-2"
+                                }, [
+                                    React.createElement('button', {
+                                        key: 'exportBtn',
+                                        onClick: exportData,
+                                        className: "w-full flex items-center gap-2 p-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm"
+                                    }, [
+                                        React.createElement(Icons.Download),
+                                        'Export Alle'
+                                    ]),
+                                    React.createElement('button', {
+                                        key: 'importBtn',
+                                        onClick: () => fileInputRef.current && fileInputRef.current.click(),
+                                        className: "w-full flex items-center gap-2 p-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm"
+                                    }, [
+                                        React.createElement(Icons.Upload),
+                                        'Import'
+                                    ]),
+                                    React.createElement('input', {
+                                        key: 'fileInput',
+                                        type: "file",
+                                        ref: fileInputRef,
+                                        onChange: importData,
+                                        accept: ".json",
+                                        className: "hidden"
+                                    })
+                                ])
+                            ]),
+
+                            // Module Library
+                            showModuleLibrary && React.createElement('div', {
+                                key: 'moduleLibrary',
+                                className: "bg-white rounded-lg shadow-sm p-4"
+                            }, [
+                                React.createElement('div', {
+                                    key: 'moduleHeader',
+                                    className: "flex items-center justify-between mb-4"
+                                }, [
+                                    React.createElement('h2', {
+                                        key: 'moduleTitle',
+                                        className: "text-lg font-semibold"
+                                    }, '📦 Module'),
+                                    React.createElement('button', {
+                                        key: 'addModuleBtn',
+                                        onClick: () => setShowNewModuleInput(!showNewModuleInput),
+                                        className: "p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                                    }, React.createElement(Icons.Plus))
+                                ]),
+
+                                showNewModuleInput && React.createElement('div', {
+                                    key: 'newModuleInput',
+                                    className: "mb-4 p-3 bg-gray-50 rounded-lg"
+                                }, [
+                                    React.createElement('input', {
+                                        key: 'moduleNameInput',
+                                        type: "text",
+                                        placeholder: "Modul Name",
+                                        value: newModuleName,
+                                        onChange: (e) => setNewModuleName(e.target.value),
+                                        className: "w-full p-2 border rounded mb-2 text-sm"
+                                    }),
+                                    React.createElement('textarea', {
+                                        key: 'moduleContentInput',
+                                        placeholder: "HTML Code",
+                                        value: newModuleContent,
+                                        onChange: (e) => setNewModuleContent(e.target.value),
+                                        className: "w-full p-2 border rounded mb-2 text-sm h-20 font-mono"
+                                    }),
+                                    React.createElement('div', {
+                                        key: 'moduleInputButtons',
+                                        className: "flex gap-2"
+                                    }, [
+                                        React.createElement('button', {
+                                            key: 'addModuleBtn',
+                                            onClick: editingModule ? updateModuleInLibrary : addNewModule,
+                                            className: "px-3 py-1 bg-green-600 text-white rounded text-sm"
+                                        }, editingModule ? 'Aktualisieren' : 'Hinzufügen'),
+                                        React.createElement('button', {
+                                            key: 'cancelModuleBtn',
+                                            onClick: () => {
+                                                setEditingModule(null);
+                                                setShowNewModuleInput(false);
+                                                setNewModuleName('');
+                                                setNewModuleContent('');
+                                            },
+                                            className: "px-3 py-1 bg-gray-400 text-white rounded text-sm"
+                                        }, 'Abbrechen')
+                                    ])
+                                ]),
+
+                                React.createElement('div', {
+                                    key: 'moduleList',
+                                    className: "space-y-2 max-h-96 overflow-y-auto"
+                                }, Object.keys(modules).map(moduleName => 
+                                    React.createElement('div', {
+                                        key: moduleName,
+                                        className: "flex items-center justify-between p-2 border rounded-lg hover:bg-gray-50"
+                                    }, [
+                                        React.createElement('span', {
+                                            key: `name-${moduleName}`,
+                                            className: "text-sm text-gray-700 flex-1 mr-2"
+                                        }, moduleName),
+                                        React.createElement('div', {
+                                            key: `actions-${moduleName}`,
+                                            className: "flex gap-1"
+                                        }, [
+                                            React.createElement('button', {
+                                                key: `edit-${moduleName}`,
+                                                onClick: () => editModuleInLibrary(moduleName),
+                                                className: "p-1 text-blue-600 hover:bg-blue-50 rounded",
+                                                title: "Modul bearbeiten"
+                                            }, React.createElement(Icons.Edit)),
+                                            React.createElement('button', {
+                                                key: `add-${moduleName}`,
+                                                onClick: () => {
+                                                    addModuleToTemplate(moduleName);
+                                                    alert(`Modul "${moduleName}" zum Template hinzugefügt!`);
+                                                },
+                                                className: "p-1 bg-green-600 text-white rounded hover:bg-green-700",
+                                                title: "Zu Template hinzufügen"
+                                            }, React.createElement(Icons.PlusCircle))
+                                        ])
+                                    ])
+                                ))
+                            ])
+                        ]),
+
+                        // Main Content
+                        React.createElement('div', {
+                            key: 'mainContent',
+                            className: "lg:col-span-3 space-y-6"
+                        }, [
+                            // Template Info
+                            React.createElement('div', {
+                                key: 'templateInfo',
+                                className: "bg-blue-50 border border-blue-200 rounded-lg p-4"
+                            }, [
+                                React.createElement('h3', {
+                                    key: 'infoTitle',
+                                    className: "font-semibold text-blue-800 mb-2"
+                                }, `📋 Template: ${currentTemplate}`),
+                                React.createElement('p', {
+                                    key: 'infoText',
+                                    className: "text-blue-700 text-sm"
+                                }, `${templateContent.length} Module${templateContent.length !== 1 ? 's' : ''} • ${previewMode ? (editablePreview ? 'Bearbeitbare Preview aktiv' : 'Preview aktiv') : 'Code-Ansicht aktiv'}`)
+                            ]),
+
+                            // Template Modules  
+                            ...templateContent.map((module) => 
+                                React.createElement('div', {
+                                    key: `${module.name}-${module.index}`,
+                                    className: "bg-white rounded-lg shadow-sm p-6"
+                                }, [
+                                    React.createElement('div', {
+                                        key: 'moduleHeader',
+                                        className: "flex items-center justify-between mb-4 flex-wrap gap-2"
+                                    }, [
+                                        React.createElement('div', {
+                                            key: 'moduleTitle',
+                                            className: "flex items-center gap-3"
+                                        }, [
+                                            React.createElement('h3', {
+                                                key: 'title',
+                                                className: "text-lg font-semibold text-gray-800"
+                                            }, `${module.index + 1}. ${module.name}`),
+                                            React.createElement('div', {
+                                                key: 'moveButtons',
+                                                className: "flex gap-1"
+                                            }, [
+                                                // Nach oben Button
+                                                module.index > 0 && React.createElement('button', {
+                                                    key: 'moveUpBtn',
+                                                    onClick: () => moveModuleUp(module.index),
+                                                    className: "p-1 text-blue-600 hover:bg-blue-50 rounded",
+                                                    title: "Nach oben verschieben"
+                                                }, React.createElement(Icons.ArrowUp)),
+                                                // Nach unten Button
+                                                module.index < templateContent.length - 1 && React.createElement('button', {
+                                                    key: 'moveDownBtn',
+                                                    onClick: () => moveModuleDown(module.index),
+                                                    className: "p-1 text-blue-600 hover:bg-blue-50 rounded",
+                                                    title: "Nach unten verschieben"
+                                                }, React.createElement(Icons.ArrowDown))
+                                            ]),
+                                            React.createElement('div', {
+                                                key: 'moduleActions',
+                                                className: "flex gap-1"
+                                            }, [
+                                                // Modul zu anderem Template kopieren
+                                                Object.keys(templates).length > 1 && React.createElement('div', {
+                                                    key: 'copyToTemplate',
+                                                    className: "relative copy-dropdown-parent"
+                                                }, [
+                                                    React.createElement('button', {
+                                                        key: 'copyBtn',
+                                                        className: "p-1 text-green-600 hover:bg-green-50 rounded",
+                                                        title: "In anderes Template kopieren"
+                                                    }, React.createElement(Icons.Clone)),
+                                                    React.createElement('div', {
+                                                        key: 'copyDropdown',
+                                                        className: "copy-dropdown"
+                                                    }, Object.keys(templates).filter(t => t !== currentTemplate).map(targetTemplate =>
+                                                        React.createElement('button', {
+                                                            key: targetTemplate,
+                                                            onClick: () => copyModuleToTemplate({
+                                                                name: module.name,
+                                                                content: module.content
+                                                            }, targetTemplate),
+                                                            className: "block w-full text-left px-3 py-1 hover:bg-gray-100 rounded text-sm"
+                                                        }, `→ ${targetTemplate}`)
+                                                    ))
+                                                ]),
+                                                React.createElement('button', {
+                                                    key: 'removeBtn',
+                                                    onClick: () => {
+                                                        if(confirm(`Modul "${module.name}" aus dem Template entfernen?`)) {
+                                                            removeModuleFromTemplate(module.index);
+                                                        }
+                                                    },
+                                                    className: "p-1 text-red-600 hover:bg-red-50 rounded",
+                                                    title: "Modul entfernen"
+                                                }, React.createElement(Icons.Trash))
+                                            ])
+                                        ]),
+                                        React.createElement('div', {
+                                            key: 'moduleHeaderActions',
+                                            className: "flex gap-2 flex-wrap"
+                                        }, [
+                                            (!previewMode || editablePreview) && React.createElement('button', {
+                                                key: 'htmlEditorBtn',
+                                                onClick: () => toggleCodeEditor(module.index),
+                                                className: `flex items-center gap-2 px-3 py-1 ${showEditor[module.index] ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-700'} rounded-lg hover:bg-blue-600 hover:text-white text-sm`
+                                            }, [
+                                                React.createElement(Icons.Edit),
+                                                showEditor[module.index] ? 'Editor schließen' : 'HTML Editor'
+                                            ]),
+                                            React.createElement('button', {
+                                                key: 'copyBtn',
+                                                onClick: () => copyToClipboard(module.content, `${module.name}-${module.index}`),
+                                                'data-copy': `${module.name}-${module.index}`,
+                                                className: "flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                            }, [
+                                                React.createElement(Icons.Copy),
+                                                'Kopieren'
+                                            ])
+                                        ])
+                                    ]),
+
+                                    // HTML-Struktur-erhaltender Editor
+                                    showEditor[module.index] && React.createElement('div', {
+                                        key: 'htmlEditorPanel',
+                                        className: "border border-gray-300 rounded-lg p-4 mb-4 bg-white"
+                                    }, [
+                                        React.createElement('div', {
+                                            key: 'htmlEditorHeader',
+                                            className: "flex justify-between items-center mb-3"
+                                        }, [
+                                            React.createElement('h4', {
+                                                key: 'htmlEditorTitle',
+                                                className: "font-medium text-gray-700"
+                                            }, `HTML-Editor: ${module.name}`),
+                                            React.createElement('button', {
+                                                key: 'closeHtmlEditorBtn',
+                                                onClick: () => toggleCodeEditor(module.index),
+                                                className: "text-red-600 hover:text-red-800 font-bold"
+                                            }, '✕')
+                                        ]),
+                                        React.createElement('div', {
+                                            key: 'htmlEditorTabs',
+                                            className: "flex mb-3 border-b"
+                                        }, [
+                                            React.createElement('button', {
+                                                key: 'htmlTab',
+                                                className: "px-4 py-2 border-b-2 border-blue-500 text-blue-600 font-medium"
+                                            }, 'HTML Code'),
+                                            React.createElement('div', {
+                                                key: 'htmlInfo',
+                                                className: "ml-4 py-2 text-sm text-gray-600"
+                                            }, 'Tabellen-Struktur wird beibehalten')
+                                        ]),
+                                        React.createElement('textarea', {
+                                            key: 'htmlTextarea',
+                                            value: module.content,
+                                            onChange: (e) => updateModuleContent(module.name, e.target.value),
+                                            className: "w-full h-64 p-4 font-mono text-sm border border-gray-300 rounded-lg resize-y focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50",
+                                            placeholder: "HTML Code hier bearbeiten...",
+                                            spellCheck: false
+                                        }),
+                                        React.createElement('div', {
+                                            key: 'htmlPreview',
+                                            className: "mt-3 p-3 border border-gray-200 rounded-lg bg-gray-50"
+                                        }, [
+                                            React.createElement('h5', {
+                                                key: 'previewTitle',
+                                                className: "text-sm font-medium text-gray-700 mb-2"
+                                            }, 'Live-Vorschau:'),
+                                            React.createElement('div', {
+                                                key: 'previewContent',
+                                                className: "text-sm",
+                                                dangerouslySetInnerHTML: { __html: module.content }
+                                            })
+                                        ])
+                                    ]),
+
+                                    // Content Area
+                                    previewMode ? (
+                                        editablePreview ? (
+                                            React.createElement('div', {
+                                                key: 'editableContent',
+                                                className: "border-2 border-dashed border-green-300 rounded-lg p-4 bg-green-50 min-h-24",
+                                                contentEditable: true,
+                                                dangerouslySetInnerHTML: { __html: module.content },
+                                                onFocus: (e) => {
+                                                    setActiveTextarea(e.target);
+                                                    e.target.dataset.moduleIndex = module.index;
+                                                },
+                                                onBlur: (e) => {
+                                                    const newContent = e.target.innerHTML;
+                                                    updateModuleContent(module.name, newContent);
+                                                },
+                                                style: { outline: 'none' },
+                                                title: "Klicken Sie hier, um den Inhalt direkt zu bearbeiten"
+                                            })
+                                        ) : (
+                                            React.createElement('div', {
+                                                key: 'previewContent',
+                                                className: "border border-gray-200 rounded-lg p-4 bg-gray-50 max-h-64 overflow-y-auto",
+                                                dangerouslySetInnerHTML: { __html: module.content }
+                                            })
+                                        )
+                                    ) : (
+                                        React.createElement('textarea', {
+                                            key: 'textareaContent',
+                                            value: module.content,
+                                            onChange: (e) => updateModuleContent(module.name, e.target.value),
+                                            onFocus: (e) => {
+                                                setActiveTextarea(e.target);
+                                                e.target.dataset.moduleIndex = module.index;
+                                            },
+                                            className: "w-full h-64 p-4 font-mono text-sm border border-gray-300 rounded-lg resize-y focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+                                            placeholder: "HTML Code hier bearbeiten..."
+                                        })
+                                    )
+                                ])
+                            ),
+
+                            // Complete Template Copy
+                            React.createElement('div', {
+                                key: 'completeTemplate',
+                                className: "bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg shadow-lg p-6"
+                            }, [
+                                React.createElement('div', {
+                                    key: 'completeHeader',
+                                    className: "flex items-center justify-between flex-wrap gap-4"
+                                }, [
+                                    React.createElement('div', { key: 'completeInfo' }, [
+                                        React.createElement('h3', {
+                                            key: 'completeTitle',
+                                            className: "text-xl font-bold text-gray-800"
+                                        }, '🎯 Komplettes Template'),
+                                        React.createElement('p', {
+                                            key: 'completeDescription',
+                                            className: "text-gray-600 mt-1"
+                                        }, `Alle ${templateContent.length} Module als fertiges Salesforce-Template`)
+                                    ]),
+                                    React.createElement('button', {
+                                        key: 'copyAllBtn',
+                                        onClick: () => {
+                                            const completeHtml = templateContent.map(m => m.content).join('\n\n');
+                                            copyToClipboard(completeHtml, 'complete');
+                                        },
+                                        'data-copy': 'complete',
+                                        className: "flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-lg"
+                                        }, [
+                                        React.createElement(Icons.Copy),
+                                        `📥 Alles kopieren`
+                                    ])
+                                ])
+                            ])
+                        ])
+                    ])
+                ])
+            ]);
+        };
+
+        // Render the app
+        ReactDOM.render(React.createElement(SalesforceTemplateEditor), document.getElementById('root'));
+    </script>
+</body>
+</html>
