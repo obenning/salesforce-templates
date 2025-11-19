@@ -2172,7 +2172,8 @@
                                         editablePreview ? [
                                             React.createElement(FormatToolbar, {
                                                 key: 'toolbar',
-                                                moduleIndex: module.index
+                                                moduleIndex: module.index,
+                                                editableRef: activeEditableDiv
                                             }),
                                             React.createElement('div', {
                                                 key: 'editableContent',
@@ -2180,6 +2181,7 @@
                                                 contentEditable: true,
                                                 dangerouslySetInnerHTML: { __html: module.content },
                                                 onFocus: (e) => {
+                                                    setActiveEditableDiv(e.target);
                                                     setActiveTextarea(e.target);
                                                     e.target.dataset.moduleIndex = module.index;
                                                 },
