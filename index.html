@@ -806,113 +806,121 @@
 
             // Templates bestehen aus Modulen
             const [templates, setTemplates] = useState({
-                'Bayern Schulung': {
-                    modules: ['Header mit Logo', 'Hauptüberschrift', 'Termin-Box', 'Primary Button', 'Aufzählungsliste', 'Footer'],
+                'Beispiel-Newsletter': {
+                    modules: [
+                        { id: 'module_1', name: 'Header mit Logo' },
+                        { id: 'module_2', name: 'Hauptüberschrift' },
+                        { id: 'module_3', name: 'Termin-Box' },
+                        { id: 'module_4', name: 'Primary Button' },
+                        { id: 'module_5', name: 'Aufzählungsliste' },
+                        { id: 'module_6', name: 'Footer' }
+                    ],
                     customContent: {
-                        'Hauptüberschrift': `<table cellpadding="0" cellspacing="0" width="100%">
-	<tbody>
-		<tr>
-			<td align="center" style="background-color: #f8f9fa;">
-			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
-				<tbody>
-					<tr>
-						<td style="padding: 15px;">
-						<h1 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 22px;">Zertifikate-Prüfung für Bayern erforderlich</h1>
-						<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;"><strong>{{#if Recipient.FirstName}}Guten Tag {{{Recipient.FirstName}}} {{{Recipient.LastName}}},{{else}}Guten Tag,{{/if}}</strong></p>
-						<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">die Zertifikate für Ihre Präventionsschulungen für Servicekräfte Sportwette und Spielhalle <strong>in Bayern</strong> sind 2 Jahre gültig. <strong>Prüfen Sie jetzt die Gültigkeit Ihrer Mitarbeiter-Zertifikate.</strong></p>
-						<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">Buchen Sie bei Bedarf „Online-Präventionsschulungen für Servicekräfte Sportwette &amp; Spielhalle" bei Kerberos Compliance in Kooperation mit der GSP-Akademie.</p>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			</td>
-		</tr>
-	</tbody>
-</table>`,
-                        'Termin-Box': `<table cellpadding="0" cellspacing="0" width="100%">
-	<tbody>
-		<tr>
-			<td align="center" style="background-color: #f8f9fa;">
-			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
-				<tbody>
-					<tr>
-						<td style="padding: 15px;">
-						<table cellpadding="0" cellspacing="0" style="background-color: #f1f3f5; width: 100%;">
-							<tbody>
-								<tr>
-									<td style="padding: 15px;">
-									<h3 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 18px;">Verfügbare Schulungstermine</h3>
-									<ul style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">
-										<li><strong>Di, 30.09.2025 &amp; Mi, 01.10.2025</strong> – jeweils von 9-13 Uhr</li>
-										<li><strong>Sa, 11.10.2025 &amp; So, 12.10.2025</strong> – jeweils von 9-13 Uhr</li>
-									</ul>
-									<p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;"><strong>Wichtig:</strong> Die Online-Präventionsschulungen sind ausschließlich als Auffrischungsschulungen erlaubt.</p>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			</td>
-		</tr>
-	</tbody>
-</table>`,
-                        'Primary Button': `<table cellpadding="0" cellspacing="0" width="100%">
-	<tbody>
-		<tr>
-			<td align="center" style="background-color: #f8f9fa;">
-			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
-				<tbody>
-					<tr>
-						<td style="padding: 20px;">
-						<table cellpadding="0" cellspacing="0" style="background-color: #009CE6;">
-							<tbody>
-								<tr>
-									<td style="padding: 12px 25px;"><a href="https://form.jotform.com/252654679241060" style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #ffffff; font-size: 14px; text-decoration: none; font-weight: bold;">Jetzt buchen &rarr;</a></td>
-								</tr>
-							</tbody>
-						</table>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			</td>
-		</tr>
-	</tbody>
-</table>`,
-                        'Aufzählungsliste': `<table cellpadding="0" cellspacing="0" width="100%">
-	<tbody>
-		<tr>
-			<td align="center" style="background-color: #f8f9fa;">
-			<table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
-				<tbody>
-					<tr>
-						<td style="padding: 15px;">
-						<h3 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 16px;">Warum Kerberos Compliance?</h3>
-						<ul style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">
-							<li>Unsere Schulungen sind <strong>in Bayern anerkannt</strong></li>
-							<li>Durchführung von <strong>Glücksspielexperten</strong></li>
-							<li>Flexible Online-Termine</li>
-							<li>Kooperation mit der GSP-Akademie</li>
-						</ul>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			</td>
-		</tr>
-	</tbody>
-</table>`
+                        'module_2': `<table cellpadding="0" cellspacing="0" width="100%">
+                <tbody>
+                    <tr>
+                        <td align="center" style="background-color: #f8f9fa;">
+                        <table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 15px;">
+                                    <h1 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 22px;">Zertifikate-Prüfung für Bayern erforderlich</h1>
+                                    <p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;"><strong>{{#if Recipient.FirstName}}Guten Tag {{{Recipient.FirstName}}} {{{Recipient.LastName}}},{{else}}Guten Tag,{{/if}}</strong></p>
+                                    <p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">die Zertifikate für Ihre Präventionsschulungen für Servicekräfte Sportwette und Spielhalle <strong>in Bayern</strong> sind 2 Jahre gültig. <strong>Prüfen Sie jetzt die Gültigkeit Ihrer Mitarbeiter-Zertifikate.</strong></p>
+                                    <p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">Buchen Sie bei Bedarf „Online-Präventionsschulungen für Servicekräfte Sportwette &amp; Spielhalle" bei Kerberos Compliance in Kooperation mit der GSP-Akademie.</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>`,
+                        'module_3': `<table cellpadding="0" cellspacing="0" width="100%">
+                <tbody>
+                    <tr>
+                        <td align="center" style="background-color: #f8f9fa;">
+                        <table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 15px;">
+                                    <table cellpadding="0" cellspacing="0" style="background-color: #f1f3f5; width: 100%;">
+                                        <tbody>
+                                            <tr>
+                                                <td style="padding: 15px;">
+                                                <h3 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 18px;">Verfügbare Schulungstermine</h3>
+                                                <ul style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">
+                                                    <li><strong>Di, 30.09.2025 &amp; Mi, 01.10.2025</strong> – jeweils von 9-13 Uhr</li>
+                                                    <li><strong>Sa, 11.10.2025 &amp; So, 12.10.2025</strong> – jeweils von 9-13 Uhr</li>
+                                                </ul>
+                                                <p style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;"><strong>Wichtig:</strong> Die Online-Präventionsschulungen sind ausschließlich als Auffrischungsschulungen erlaubt.</p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>`,
+                        'module_4': `<table cellpadding="0" cellspacing="0" width="100%">
+                <tbody>
+                    <tr>
+                        <td align="center" style="background-color: #f8f9fa;">
+                        <table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 20px;">
+                                    <table cellpadding="0" cellspacing="0" style="background-color: #009CE6;">
+                                        <tbody>
+                                            <tr>
+                                                <td style="padding: 12px 25px;"><a href="https://form.jotform.com/252654679241060" style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #ffffff; font-size: 14px; text-decoration: none; font-weight: bold;">Jetzt buchen &rarr;</a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>`,
+                        'module_5': `<table cellpadding="0" cellspacing="0" width="100%">
+                <tbody>
+                    <tr>
+                        <td align="center" style="background-color: #f8f9fa;">
+                        <table cellpadding="0" cellspacing="0" style="background-color: #ffffff;" width="600">
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 15px;">
+                                    <h3 style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #063AA8; font-size: 16px;">Warum Kerberos Compliance?</h3>
+                                    <ul style="font-family: Tahoma,Arial,Helvetica,sans-serif; color: #212529; font-size: 14px;">
+                                        <li>Unsere Schulungen sind <strong>in Bayern anerkannt</strong></li>
+                                        <li>Durchführung von <strong>Glücksspielexperten</strong></li>
+                                        <li>Flexible Online-Termine</li>
+                                        <li>Kooperation mit der GSP-Akademie</li>
+                                    </ul>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>`
                     }
                 }
             });
 
+
             const [currentTemplate, setCurrentTemplate] = useState('Bayern Schulung');
-            const [editablePreview, setEditablePreview] = useState(false);
-            const [previewMode, setPreviewMode] = useState(false);
-            const [showModuleLibrary, setShowModuleLibrary] = useState(false);
+            const [editablePreview, setEditablePreview] = useState(true);
+            const [previewMode, setPreviewMode] = useState(true);
+            const [showModuleLibrary, setShowModuleLibrary] = useState(true);
             const [newTemplateName, setNewTemplateName] = useState('');
             const [newModuleName, setNewModuleName] = useState('');
             const [newModuleContent, setNewModuleContent] = useState('');
@@ -949,20 +957,28 @@
                 const template = templates[currentTemplate];
                 if (!template) return [];
                 
-                return template.modules.map((moduleName, index) => ({
-                    name: moduleName,
-                    content: template.customContent?.[moduleName] || modules[moduleName] || '',
-                    index
-                }));
+                return template.modules.map((moduleObj, index) => {
+                    const moduleId = typeof moduleObj === 'string' ? moduleObj : moduleObj.id;
+                    const moduleName = typeof moduleObj === 'string' ? moduleObj : moduleObj.name;
+                    
+                    return {
+                        id: moduleId,
+                        name: moduleName,
+                        content: template.customContent?.[moduleId] || modules[moduleName] || '',
+                        index
+                    };
+                });
             };
 
             // Modul zu Template hinzufügen
             const addModuleToTemplate = (moduleName) => {
+                const newModuleId = `module_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                
                 setTemplates(prev => ({
                     ...prev,
                     [currentTemplate]: {
                         ...prev[currentTemplate],
-                        modules: [...(prev[currentTemplate]?.modules || []), moduleName]
+                        modules: [...(prev[currentTemplate]?.modules || []), { id: newModuleId, name: moduleName }]
                     }
                 }));
             };
@@ -975,8 +991,10 @@
                     const newCustomContent = { ...template.customContent };
                     
                     const removedModule = template.modules[moduleIndex];
-                    if (newCustomContent[removedModule]) {
-                        delete newCustomContent[removedModule];
+                    const removedModuleId = typeof removedModule === 'string' ? removedModule : removedModule.id;
+                    
+                    if (newCustomContent[removedModuleId]) {
+                        delete newCustomContent[removedModuleId];
                     }
                     
                     return {
@@ -1036,14 +1054,14 @@
             };
 
             // Modul-Inhalt aktualisieren
-            const updateModuleContent = (moduleName, content) => {
+            const updateModuleContent = (moduleId, content) => {
                 setTemplates(prev => ({
                     ...prev,
                     [currentTemplate]: {
                         ...prev[currentTemplate],
                         customContent: {
                             ...prev[currentTemplate]?.customContent,
-                            [moduleName]: content
+                            [moduleId]: content
                         }
                     }
                 }));
@@ -1103,11 +1121,31 @@
                     counter++;
                 }
                 
+                // Neue IDs für kopierte Module generieren
+                const originalModules = prev[templateName].modules;
+                const newModules = originalModules.map(moduleObj => {
+                    const moduleName = typeof moduleObj === 'string' ? moduleObj : moduleObj.name;
+                    return {
+                        id: `module_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                        name: moduleName
+                    };
+                });
+                
+                // Custom Content mit neuen IDs mappen
+                const newCustomContent = {};
+                originalModules.forEach((moduleObj, index) => {
+                    const oldId = typeof moduleObj === 'string' ? moduleObj : moduleObj.id;
+                    const newId = newModules[index].id;
+                    if (prev[templateName].customContent[oldId]) {
+                        newCustomContent[newId] = prev[templateName].customContent[oldId];
+                    }
+                });
+                
                 setTemplates(prev => ({
                     ...prev,
                     [finalName]: {
-                        modules: [...prev[templateName].modules],
-                        customContent: { ...prev[templateName].customContent }
+                        modules: newModules,
+                        customContent: newCustomContent
                     }
                 }));
                 
@@ -1118,15 +1156,16 @@
             // Modul zwischen Templates kopieren
             const copyModuleToTemplate = (moduleData, targetTemplate) => {
                 const { name, content } = moduleData;
+                const newModuleId = `module_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
                 
                 setTemplates(prev => ({
                     ...prev,
                     [targetTemplate]: {
                         ...prev[targetTemplate],
-                        modules: [...(prev[targetTemplate]?.modules || []), name],
+                        modules: [...(prev[targetTemplate]?.modules || []), { id: newModuleId, name: name }],
                         customContent: {
                             ...prev[targetTemplate]?.customContent,
-                            [name]: content
+                            [newModuleId]: content
                         }
                     }
                 }));
@@ -1239,16 +1278,6 @@
                                 key: 'headerButtons',
                                 className: "flex gap-2 flex-wrap"
                             }, [
-                                React.createElement('button', {
-                                    key: 'moduleBtn',
-                                    onClick: () => setShowModuleLibrary(!showModuleLibrary),
-                                    className: `flex items-center gap-2 px-4 py-2 rounded-lg font-medium ${
-                                        showModuleLibrary ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700'
-                                    }`
-                                }, [
-                                    React.createElement(Icons.Package, { key: 'packageIcon' }),
-                                    'Module'
-                                ]),
                                 React.createElement('button', {
                                     key: 'editBtn',
                                     onClick: () => setEditablePreview(!editablePreview),
@@ -1408,7 +1437,7 @@
                             ]),
 
                             // Module Library
-                            showModuleLibrary && React.createElement('div', {
+                            React.createElement('div', {
                                 key: 'moduleLibrary',
                                 className: "bg-white rounded-lg shadow-sm p-4"
                             }, [
@@ -1542,7 +1571,13 @@
                                             React.createElement('h3', {
                                                 key: 'title',
                                                 className: "text-lg font-semibold text-gray-800"
-                                            }, `${module.index + 1}. ${module.name}`),
+                                            }, [
+                                                `${module.index + 1}. ${module.name}`,
+                                                React.createElement('span', {
+                                                    key: 'moduleId',
+                                                    className: "text-xs text-gray-400 ml-2 font-mono"
+                                                }, `#${module.id.substr(-8)}`)
+                                            ]),
                                             React.createElement('div', {
                                                 key: 'moveButtons',
                                                 className: "flex gap-1"
@@ -1661,7 +1696,7 @@
                                         React.createElement('textarea', {
                                             key: 'htmlTextarea',
                                             value: module.content,
-                                            onChange: (e) => updateModuleContent(module.name, e.target.value),
+                                            onChange: (e) => updateModuleContent(module.id, e.target.value),
                                             className: "w-full h-64 p-4 font-mono text-sm border border-gray-300 rounded-lg resize-y focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50",
                                             placeholder: "HTML Code hier bearbeiten...",
                                             spellCheck: false
@@ -1696,7 +1731,7 @@
                                                 },
                                                 onBlur: (e) => {
                                                     const newContent = e.target.innerHTML;
-                                                    updateModuleContent(module.name, newContent);
+                                                    updateModuleContent(module.id, newContent);
                                                 },
                                                 style: { outline: 'none' },
                                                 title: "Klicken Sie hier, um den Inhalt direkt zu bearbeiten"
@@ -1712,7 +1747,7 @@
                                         React.createElement('textarea', {
                                             key: 'textareaContent',
                                             value: module.content,
-                                            onChange: (e) => updateModuleContent(module.name, e.target.value),
+                                            onChange: (e) => updateModuleContent(module.id, e.target.value),
                                             onFocus: (e) => {
                                                 setActiveTextarea(e.target);
                                                 e.target.dataset.moduleIndex = module.index;
