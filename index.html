@@ -14,6 +14,16 @@
             margin: 0; 
             padding: 0; 
         }
+
+        .border-2[contenteditable="true"] a {
+            color: #009CE6;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .border-2[contenteditable="true"] a:hover {
+            color: #007DB7;
+        }
+        
         .icon {
             display: inline-block;
             width: 16px;
@@ -943,6 +953,289 @@
                 document.execCommand('insertText', false, text);
             };
 
+            // Formatierungs-Funktionen für Rich Text Editor
+            const applyFormat = (command, value = null) => {
+                document.execCommand(command, false, value);
+            };
+
+            // Kerberos Farbpalette
+            const kerberosColors = {
+                primary: '#063AA8',      // Kerberos Blau
+                secondary: '#009CE6',    // Kerberos Hellblau
+                text: '#212529',         // Standard Text
+                primaryHover: '#294FC5', // Hover Blau
+                secondaryHover: '#007DB7', // Hover Hellblau
+                textHover: '#3A3F42',    // Hover Text
+                // Abstufungen
+                primary80: '#354FB4',
+                primary60: '#6465C0',
+                primary40: '#939ACC',
+                primary20: '#C1C1D8',
+                secondary80: '#33AADF',
+                secondary60: '#66B8D9',
+                secondary40: '#99C6D2',
+                secondary20: '#CCE3EB'
+            };
+
+            // Toolbar Komponente
+            const FormatToolbar = ({ moduleIndex }) => {
+                const [showColorPicker, setShowColorPicker] = React.useState(false);
+                const [showLinkInput, setShowLinkInput] = React.useState(false);
+                const [linkUrl, setLinkUrl] = React.useState('');
+
+                const insertLink = () => {
+                    if (linkUrl) {
+                        applyFormat('createLink', linkUrl);
+                        setLinkUrl('');
+                        setShowLinkInput(false);
+                    }
+                };
+
+                return React.createElement('div', {
+                    className: "bg-gray-100 border border-gray-300 rounded-lg p-2 mb-2 flex flex-wrap gap-2 items-center"
+                }, [
+                    // Textformatierung Gruppe
+                    React.createElement('div', {
+                        key: 'textFormat',
+                        className: "flex gap-1 border-r pr-2"
+                    }, [
+                        React.createElement('button', {
+                            key: 'bold',
+                            onClick: () => applyFormat('bold'),
+                            className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 font-bold",
+                            title: "Fett (Strg+B)",
+                            type: "button"
+                        }, 'B'),
+                        React.createElement('button', {
+                            key: 'italic',
+                            onClick: () => applyFormat('italic'),
+                            className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 italic",
+                            title: "Kursiv (Strg+I)",
+                            type: "button"
+                        }, 'I'),
+                        React.createElement('button', {
+                            key: 'underline',
+                            onClick: () => applyFormat('underline'),
+                            className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 underline",
+                            title: "Unterstrichen (Strg+U)",
+                            type: "button"
+                        }, 'U')
+                    ]),
+
+                    // Überschriften Gruppe
+                    React.createElement('div', {
+                        key: 'headings',
+                        className: "flex gap-1 border-r pr-2"
+                    }, [
+                        React.createElement('button', {
+                            key: 'h1',
+                            onClick: () => applyFormat('formatBlock', '<h1>'),
+                            className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
+                            title: "Überschrift 1",
+                            type: "button"
+                        }, 'H1'),
+                        React.createElement('button', {
+                            key: 'h2',
+                            onClick: () => applyFormat('formatBlock', '<h2>'),
+                            className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
+                            title: "Überschrift 2",
+                            type: "button"
+                        }, 'H2'),
+                        React.createElement('button', {
+                            key: 'h3',
+                            onClick: () => applyFormat('formatBlock', '<h3>'),
+                            className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
+                            title: "Überschrift 3",
+                            type: "button"
+                        }, 'H3'),
+                        React.createElement('button', {
+                            key: 'h4',
+                            onClick: () => applyFormat('formatBlock', '<h4>'),
+                            className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
+                            title: "Überschrift 4",
+                            type: "button"
+                        }, 'H4'),
+                        React.createElement('button', {
+                            key: 'h5',
+                            onClick: () => applyFormat('formatBlock', '<h5>'),
+                            className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs font-bold",
+                            title: "Überschrift 5",
+                            type: "button"
+                        }, 'H5'),
+                        React.createElement('button', {
+                            key: 'p',
+                            onClick: () => applyFormat('formatBlock', '<p>'),
+                            className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs",
+                            title: "Normaler Text",
+                            type: "button"
+                        }, 'P')
+                    ]),
+
+                    // Listen Gruppe
+                    React.createElement('div', {
+                        key: 'lists',
+                        className: "flex gap-1 border-r pr-2"
+                    }, [
+                        React.createElement('button', {
+                            key: 'ul',
+                            onClick: () => applyFormat('insertUnorderedList'),
+                            className: "px-2 py-1 bg-white border rounded hover:bg-gray-200",
+                            title: "Aufzählungsliste",
+                            type: "button"
+                        }, '• Liste'),
+                        React.createElement('button', {
+                            key: 'ol',
+                            onClick: () => applyFormat('insertOrderedList'),
+                            className: "px-2 py-1 bg-white border rounded hover:bg-gray-200",
+                            title: "Nummerierte Liste",
+                            type: "button"
+                        }, '1. Liste')
+                    ]),
+
+                    // Farben Gruppe
+                    React.createElement('div', {
+                        key: 'colors',
+                        className: "flex gap-1 border-r pr-2 relative"
+                    }, [
+                        React.createElement('button', {
+                            key: 'colorBtn',
+                            onClick: () => setShowColorPicker(!showColorPicker),
+                            className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 flex items-center gap-1",
+                            title: "Textfarbe",
+                            type: "button"
+                        }, [
+                            React.createElement('span', { key: 'icon' }, '🎨'),
+                            React.createElement('span', { key: 'text', className: "text-xs" }, 'Farbe')
+                        ]),
+                        
+                        showColorPicker && React.createElement('div', {
+                            key: 'colorPicker',
+                            className: "absolute top-full left-0 mt-1 bg-white border rounded-lg shadow-lg p-3 z-10",
+                            style: { minWidth: '280px' }
+                        }, [
+                            React.createElement('div', {
+                                key: 'colorHeader',
+                                className: "flex justify-between items-center mb-2"
+                            }, [
+                                React.createElement('span', {
+                                    key: 'title',
+                                    className: "text-sm font-semibold"
+                                }, 'Kerberos Farben'),
+                                React.createElement('button', {
+                                    key: 'close',
+                                    onClick: () => setShowColorPicker(false),
+                                    className: "text-gray-500 hover:text-gray-700",
+                                    type: "button"
+                                }, '✕')
+                            ]),
+                            React.createElement('div', {
+                                key: 'colorGrid',
+                                className: "grid grid-cols-4 gap-2"
+                            }, [
+                                // Hauptfarben
+                                { name: 'Blau', color: kerberosColors.primary },
+                                { name: 'Hellblau', color: kerberosColors.secondary },
+                                { name: 'Text', color: kerberosColors.text },
+                                { name: 'Blau Hover', color: kerberosColors.primaryHover },
+                                // Abstufungen
+                                { name: 'Blau 80%', color: kerberosColors.primary80 },
+                                { name: 'Blau 60%', color: kerberosColors.primary60 },
+                                { name: 'Blau 40%', color: kerberosColors.primary40 },
+                                { name: 'Blau 20%', color: kerberosColors.primary20 },
+                                { name: 'Hellblau 80%', color: kerberosColors.secondary80 },
+                                { name: 'Hellblau 60%', color: kerberosColors.secondary60 },
+                                { name: 'Hellblau 40%', color: kerberosColors.secondary40 },
+                                { name: 'Hellblau 20%', color: kerberosColors.secondary20 }
+                            ].map(({ name, color }) =>
+                                React.createElement('button', {
+                                    key: color,
+                                    onClick: () => {
+                                        applyFormat('foreColor', color);
+                                        setShowColorPicker(false);
+                                    },
+                                    className: "w-12 h-12 rounded border-2 border-gray-300 hover:border-gray-500 transition-colors",
+                                    style: { backgroundColor: color },
+                                    title: name,
+                                    type: "button"
+                                })
+                            ))
+                        ])
+                    ]),
+
+                    // Link Gruppe
+                    React.createElement('div', {
+                        key: 'link',
+                        className: "flex gap-1 relative"
+                    }, [
+                        React.createElement('button', {
+                            key: 'linkBtn',
+                            onClick: () => setShowLinkInput(!showLinkInput),
+                            className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs",
+                            title: "Link einfügen",
+                            type: "button"
+                        }, '🔗 Link'),
+                        React.createElement('button', {
+                            key: 'unlinkBtn',
+                            onClick: () => applyFormat('unlink'),
+                            className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs",
+                            title: "Link entfernen",
+                            type: "button"
+                        }, '⛓️‍💥'),
+
+                        showLinkInput && React.createElement('div', {
+                            key: 'linkInput',
+                            className: "absolute top-full left-0 mt-1 bg-white border rounded-lg shadow-lg p-3 z-10",
+                            style: { minWidth: '300px' }
+                        }, [
+                            React.createElement('div', {
+                                key: 'inputGroup',
+                                className: "flex gap-2"
+                            }, [
+                                React.createElement('input', {
+                                    key: 'urlInput',
+                                    type: 'text',
+                                    value: linkUrl,
+                                    onChange: (e) => setLinkUrl(e.target.value),
+                                    onKeyPress: (e) => e.key === 'Enter' && insertLink(),
+                                    placeholder: 'https://...',
+                                    className: "flex-1 px-2 py-1 border rounded text-sm",
+                                    autoFocus: true
+                                }),
+                                React.createElement('button', {
+                                    key: 'insertBtn',
+                                    onClick: insertLink,
+                                    className: "px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700",
+                                    type: "button"
+                                }, 'OK'),
+                                React.createElement('button', {
+                                    key: 'cancelBtn',
+                                    onClick: () => {
+                                        setShowLinkInput(false);
+                                        setLinkUrl('');
+                                    },
+                                    className: "px-3 py-1 bg-gray-400 text-white rounded text-sm hover:bg-gray-500",
+                                    type: "button"
+                                }, '✕')
+                            ])
+                        ])
+                    ]),
+
+                    // Format entfernen
+                    React.createElement('div', {
+                        key: 'clear',
+                        className: "flex gap-1 border-l pl-2"
+                    }, [
+                        React.createElement('button', {
+                            key: 'removeFormat',
+                            onClick: () => applyFormat('removeFormat'),
+                            className: "px-2 py-1 bg-white border rounded hover:bg-gray-200 text-xs",
+                            title: "Formatierung entfernen",
+                            type: "button"
+                        }, '🧹 Clear')
+                    ])
+                ]);
+            };
+
             // Funktion zum Kopieren in Zwischenablage
             const copyToClipboard = async (text, part) => {
                 try {
@@ -1724,7 +2017,11 @@
 
                                     // Content Area
                                     previewMode ? (
-                                        editablePreview ? (
+                                        editablePreview ? [
+                                            React.createElement(FormatToolbar, {
+                                                key: 'toolbar',
+                                                moduleIndex: module.index
+                                            }),
                                             React.createElement('div', {
                                                 key: 'editableContent',
                                                 className: "border-2 border-dashed border-green-300 rounded-lg p-4 bg-green-50 min-h-24",
@@ -1740,9 +2037,9 @@
                                                 },
                                                 onPaste: handlePaste,
                                                 style: { outline: 'none' },
-                                                title: "Klicken Sie hier, um den Inhalt direkt zu bearbeiten"
-                                            })
-                                        ) : (
+                                            title: "Klicken Sie hier, um den Inhalt direkt zu bearbeiten"
+                                                })
+                                            ] : (
                                             React.createElement('div', {
                                                 key: 'previewContent',
                                                 className: "border border-gray-200 rounded-lg p-4 bg-gray-50 max-h-64 overflow-y-auto",
